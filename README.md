@@ -134,8 +134,9 @@ The **`visualization`** is itself discriminated on `kind`:
 supports the datum, and is a verified substring of the source record.
 
 **`meta`** = `{ source, total_trials_matched, trials_aggregated, trials_unclassified,
-filters_applied, query_interpretation, units, sort, assumptions, truncated }`. `trials_unclassified`
-and `assumptions` reconcile the bars against the trial total (see below).
+filters_applied, query_interpretation, units, sort, assumptions, advisories, truncated }`.
+`trials_unclassified` and `assumptions` reconcile the bars against the trial total; `advisories`
+flag a degenerate-but-valid chart (see below).
 
 Example `ok` response (trimmed):
 
@@ -271,6 +272,15 @@ fell out) and a human-readable `meta.assumptions` note ("312 of 3,736 trials rep
 excluded from the breakdown"; "a trial can report more than one phase…"). A property test ties the
 number to a conservation law. *Cost:* two extra meta fields. *Why:* the alternative — bars that
 quietly don't add up — is the kind of silent wrongness this whole design exists to prevent.
+
+### Low-signal advisories: flag a chart that answers nothing
+
+`engine/advisories.py`. A count can be perfectly correct and the chart still useless — a single bar,
+one value holding 95% of the total, a comparison arm with two trials in it. Deterministic checks emit
+a `meta.advisories` note in exactly those cases (kept separate from `assumptions`, which is about how
+the counts add up). *Cost:* a few heuristics with fixed thresholds. *Why:* it's the cheap, offline
+half of the chart-fitness judge `docs/EVAL.md` describes — it never refuses or alters data, it just
+tells the reader when not to over-read the picture.
 
 ### Refusal is a first-class, typed outcome
 

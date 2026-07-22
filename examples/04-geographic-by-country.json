@@ -1685,6 +1685,7 @@
         "225 of 3,736 trials report no country and are excluded from the map.",
         "A trial can report more than one country; it is counted once per country, so counts can exceed the trial total."
       ],
+      "advisories": [],
       "truncated": false
     }
   }
