@@ -72,6 +72,12 @@ class Pipeline:
         self._planner = planner
         self._client = client
 
+    async def aclose(self) -> None:
+        await self._client.aclose()
+        planner_close = getattr(self._planner, "aclose", None)
+        if planner_close is not None:
+            await planner_close()
+
     async def run(self, request: VisualizeRequest) -> AgentResponse:
         hints = _hints_from_request(request)
         try:

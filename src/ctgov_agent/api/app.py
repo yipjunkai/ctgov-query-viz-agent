@@ -5,27 +5,38 @@ pipeline. The pipeline is injected via :func:`get_pipeline` so tests can substit
 and a mocked client.
 """
 
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import Depends, FastAPI
 
 from ctgov_agent.api.schemas import AgentResponse, VisualizeRequest
+from ctgov_agent.config import get_settings
 from ctgov_agent.ctgov.client import CtgovClient
 from ctgov_agent.engine.pipeline import Pipeline
-from ctgov_agent.planner.base import UnconfiguredPlanner
+from ctgov_agent.planner.factory import build_planner
 
-app = FastAPI(
-    title="ClinicalTrials.gov Query-to-Visualization Agent",
-    version="0.1.0",
-)
-
-# Default pipeline. The real LLM planner + rule-based fallback replace UnconfiguredPlanner in the
-# next slice; until then /visualize returns a clean `refused` rather than erroring.
-_default_pipeline = Pipeline(UnconfiguredPlanner(), CtgovClient())
+# Default pipeline, wired from configuration: LLM planner if a key is set, else the rule-based
+# fallback. Tests override get_pipeline to inject a fake planner and mocked client.
+_default_pipeline = Pipeline(build_planner(get_settings()), CtgovClient())
 
 
 def get_pipeline() -> Pipeline:
     return _default_pipeline
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
+    yield
+    await _default_pipeline.aclose()
+
+
+app = FastAPI(
+    title="ClinicalTrials.gov Query-to-Visualization Agent",
+    version="0.1.0",
+    lifespan=lifespan,
+)
 
 
 @app.get("/health")
