@@ -13,16 +13,15 @@ Two deliberate choices, documented for the reviewer:
 """
 
 from enum import StrEnum
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from ctgov_agent.vocab.controlled import Phase
+from ctgov_agent.vocab.controlled import MAX_YEAR, MIN_YEAR, Phase
 
 
 class VizType(StrEnum):
     bar_chart = "bar_chart"
-    histogram = "histogram"
     time_series = "time_series"
     grouped_bar = "grouped_bar"
     choropleth = "choropleth"
@@ -121,8 +120,11 @@ class OkResponse(BaseModel):
 
 
 class RefusedResponse(BaseModel):
+    """A typed refusal. ``reason`` is a stable machine code:
+    ``out_of_domain | unsupported | too_broad | no_data | upstream_error | planner_failed``."""
+
     status: Literal["refused"] = "refused"
-    reason: str  # machine code: out_of_domain | too_broad | no_data | unsupported_intent | ...
+    reason: str
     message: str
     detail: dict[str, Any] = {}
 
@@ -150,5 +152,14 @@ class VisualizeRequest(BaseModel):
     sponsor: str | None = None
     phase: list[Phase] | None = None
     country: str | None = None
-    start_year: int | None = None
-    end_year: int | None = None
+    start_year: int | None = Field(default=None, ge=MIN_YEAR, le=MAX_YEAR)
+    end_year: int | None = Field(default=None, ge=MIN_YEAR, le=MAX_YEAR)
+
+    @model_validator(mode="after")
+    def _check_year_range(self) -> Self:
+        # Reject an inverted range at the boundary (422) rather than letting the Filters validator
+        # raise deeper in the pipeline, which would surface as a 500.
+        lo, hi = self.start_year, self.end_year
+        if lo is not None and hi is not None and lo > hi:
+            raise ValueError(f"start_year ({lo}) must be <= end_year ({hi})")
+        return self

@@ -19,17 +19,14 @@ from typing import Annotated, Any, Literal, Self
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
 
 from ctgov_agent.vocab.controlled import (
+    MAX_YEAR,
+    MIN_YEAR,
     InterventionType,
     Phase,
     SponsorClass,
     Status,
     StudyType,
 )
-
-# Plausible clinical-trial start-year bounds. CT.gov launched in 2000; the lower slack absorbs
-# legitimately backdated records, the upper leaves room for planned/future trials.
-_MIN_YEAR = 1990
-_MAX_YEAR = 2100
 
 
 class CategoricalDim(StrEnum):
@@ -71,8 +68,8 @@ class Filters(BaseModel):
     @model_validator(mode="after")
     def _validate_years(self) -> Self:
         for year in (self.start_year_min, self.start_year_max):
-            if year is not None and not (_MIN_YEAR <= year <= _MAX_YEAR):
-                raise ValueError(f"year {year} outside plausible range [{_MIN_YEAR}, {_MAX_YEAR}]")
+            if year is not None and not (MIN_YEAR <= year <= MAX_YEAR):
+                raise ValueError(f"year {year} outside plausible range [{MIN_YEAR}, {MAX_YEAR}]")
         lo, hi = self.start_year_min, self.start_year_max
         if lo is not None and hi is not None and lo > hi:
             raise ValueError(f"start_year_min ({lo}) must be <= start_year_max ({hi})")
@@ -100,7 +97,7 @@ class _Plan(BaseModel):
 
 
 class DistributionPlan(_Plan):
-    """How trials distribute across the values of one categorical dimension (bar/histogram)."""
+    """How trials distribute across the values of one categorical dimension (bar chart)."""
 
     intent: Literal["distribution"]
     dimension: CategoricalDim
