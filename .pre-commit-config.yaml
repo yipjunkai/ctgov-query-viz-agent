@@ -1,0 +1,9 @@
+# Local pre-commit hooks. Install with: uv run pre-commit install
+# Mirrors the ruff half of `just verify`; the full gate still runs in CI.
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: 2700fd5671c633760d912769c041bfcde2b9a01b # v0.15.22
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
