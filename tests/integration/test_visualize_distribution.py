@@ -181,3 +181,62 @@ def test_distribution_meta_reconciles_dropped_trials() -> None:
     assert meta["trials_aggregated"] == 3
     assert meta["trials_unclassified"] == 1
     assert any("report no phase" in note for note in meta["assumptions"])
+
+
+def test_too_broad_distribution_uses_facet_fast_path() -> None:
+    # A distribution over more trials than the threshold is answered with one exact server-side
+    # count per phase (no full paging), not refused.
+    plan = DistributionPlan(
+        intent="distribution", dimension=CategoricalDim.phase, filters=Filters(condition="cancer")
+    )
+    counts = {
+        "NA": 400,
+        "EARLY_PHASE1": 100,
+        "PHASE1": 1000,
+        "PHASE2": 1500,
+        "PHASE3": 900,
+        "PHASE4": 300,
+    }  # bar sum 4200; classified (any phase) 4000 -> unclassified 1000; 4200 > 4000 -> multivalue
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        adv = request.url.params.get("filter.advanced", "")
+        occurrences = adv.count("AREA[Phase]")
+        if occurrences == 0:
+            return httpx.Response(200, json={"totalCount": 5000, "studies": []})  # matched total
+        if occurrences > 1:
+            return httpx.Response(200, json={"totalCount": 4000, "studies": []})  # classified total
+        value = adv.replace("AREA[Phase]", "")
+        sample = {
+            "protocolSection": {
+                "identificationModule": {"nctId": f"NCT-{value}", "briefTitle": "sample"},
+                "designModule": {"phases": [value]},
+            }
+        }
+        return httpx.Response(200, json={"totalCount": counts.get(value, 0), "studies": [sample]})
+
+    ctgov = CtgovClient()
+    app.dependency_overrides[get_pipeline] = lambda: Pipeline(
+        FakePlanner(plan), ctgov, too_broad_threshold=100
+    )
+    try:
+        with respx.mock:
+            respx.get("https://clinicaltrials.gov/api/v2/studies").mock(side_effect=handler)
+            resp = TestClient(app).post("/visualize", json={"query": "cancer trials by phase"})
+    finally:
+        app.dependency_overrides.clear()
+
+    body = resp.json()
+    assert body["status"] == "ok"
+    data = {p["key"]: p["value"] for p in body["visualization"]["data"]}
+    # Exact server-side totals, though each value returned only ONE sample record — proof the count
+    # came from totalCount (fast path), not from counting fetched records.
+    assert data["PHASE2"] == 1500
+    assert sum(data.values()) == 4200
+    meta = body["meta"]
+    assert meta["total_trials_matched"] == 5000
+    assert meta["trials_unclassified"] == 1000  # 5000 matched - 4000 classified
+    assert any("too many to page" in note for note in meta["assumptions"])
+    assert any("report no phase" in note for note in meta["assumptions"])
+    # Deep citations survive: the excerpt is the exact phase value from a sample record.
+    p2 = next(p for p in body["visualization"]["data"] if p["key"] == "PHASE2")
+    assert p2["citations"] and p2["citations"][0]["excerpt"] == "PHASE2"

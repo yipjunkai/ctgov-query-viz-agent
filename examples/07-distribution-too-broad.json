@@ -1,0 +1,183 @@
+{
+  "request": {
+    "query": "How are breast cancer trials distributed across phases?",
+    "condition": "breast cancer"
+  },
+  "response": {
+    "status": "ok",
+    "visualization": {
+      "kind": "chart",
+      "type": "bar_chart",
+      "title": "Trials by Phase in breast cancer",
+      "encoding": {
+        "x": {
+          "field": "key",
+          "label": "Phase"
+        },
+        "y": {
+          "field": "value",
+          "label": "Trial count"
+        },
+        "series": null
+      },
+      "data": [
+        {
+          "key": "EARLY_PHASE1",
+          "label": "Early Phase 1",
+          "value": 231,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT02517502",
+              "excerpt": "EARLY_PHASE1",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT05921253",
+              "excerpt": "EARLY_PHASE1",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT07023861",
+              "excerpt": "EARLY_PHASE1",
+              "field": "phase"
+            }
+          ]
+        },
+        {
+          "key": "PHASE1",
+          "label": "Phase 1",
+          "value": 2488,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT02711137",
+              "excerpt": "PHASE1",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT05955105",
+              "excerpt": "PHASE1",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT04703920",
+              "excerpt": "PHASE1",
+              "field": "phase"
+            }
+          ]
+        },
+        {
+          "key": "PHASE2",
+          "label": "Phase 2",
+          "value": 4529,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT02711137",
+              "excerpt": "PHASE2",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT05955105",
+              "excerpt": "PHASE2",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT02689427",
+              "excerpt": "PHASE2",
+              "field": "phase"
+            }
+          ]
+        },
+        {
+          "key": "PHASE3",
+          "label": "Phase 3",
+          "value": 1539,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT02625441",
+              "excerpt": "PHASE3",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT07673029",
+              "excerpt": "PHASE3",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT00516269",
+              "excerpt": "PHASE3",
+              "field": "phase"
+            }
+          ]
+        },
+        {
+          "key": "PHASE4",
+          "label": "Phase 4",
+          "value": 341,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT02089854",
+              "excerpt": "PHASE4",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT04705883",
+              "excerpt": "PHASE4",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT06924229",
+              "excerpt": "PHASE4",
+              "field": "phase"
+            }
+          ]
+        },
+        {
+          "key": "NA",
+          "label": "Not Applicable",
+          "value": 4848,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT02945579",
+              "excerpt": "NA",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT04278469",
+              "excerpt": "NA",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT03645005",
+              "excerpt": "NA",
+              "field": "phase"
+            }
+          ]
+        }
+      ]
+    },
+    "meta": {
+      "source": "clinicaltrials.gov",
+      "total_trials_matched": 16631,
+      "trials_aggregated": 16631,
+      "trials_unclassified": 3663,
+      "filters_applied": {
+        "condition": "breast cancer"
+      },
+      "query_interpretation": "Planned by the deterministic rule-based fallback (no LLM key configured).",
+      "units": "trials",
+      "sort": "canonical phase order",
+      "assumptions": [
+        "This query matches 16,631 trials \u2014 too many to page individually. Each phase count is an exact server-side total; the deep citations are a small per-value sample.",
+        "3,663 of 16,631 trials report no phase and are excluded from the breakdown.",
+        "A trial can report more than one phase; it is counted once per phase, so counts can exceed the trial total."
+      ],
+      "truncated": false
+    }
+  }
+}

@@ -66,11 +66,17 @@ out-of-scope categories in the prompt closed them. (As a side effect, plan-only 
 ~35%: the unsupported half of the sample now short-circuits to a refusal instead of deliberating.)
 
 **Tier 2 — live end-to-end (n=25): 24/25 expected status.** All five intents render against live
-data; every refusal path fires correctly end-to-end. The one deviation is a **real product finding,
-not a bug**: *"status breakdown of breast cancer trials"* is refused as `too_broad` — breast cancer
-matches **16,627** trials (diabetes: 24,134), both above the 10k exact-aggregation threshold. Common,
-well-scoped questions about high-volume conditions currently dead-end; the fix is a partial-with-caveat
-response or the ingestion store (see the README's "What I'd do next").
+data; every refusal path fires correctly end-to-end. The one deviation was a **real product finding,
+not a bug**: *"status breakdown of breast cancer trials"* was refused as `too_broad` — breast cancer
+matches **16,627** trials (diabetes: 24,134), both above the 10k exact-aggregation threshold, so
+common questions about high-volume conditions dead-ended.
+
+> **Resolved since.** This finding drove the **facet fast path** (README → "Facet fast path for
+> too-broad distributions"): a too-broad *distribution* is now answered exactly via one server-side
+> count per enum value, not refused. *"breast cancer trials by phase"* now renders — see
+> [`examples/07`](../examples/07-distribution-too-broad.json). Time trends, geography, and networks
+> still refuse when too broad (they need the records); the ingestion store in "What I'd do next"
+> would lift that remaining case.
 
 ## Reproducing
 

@@ -158,9 +158,10 @@ Example `ok` response (trimmed):
 }
 ```
 
-Six full request → response examples are in **[`examples/`](examples/)**; the five deterministic ones
-regenerate with `just examples` (the comparison example needs an LLM key, since only the LLM planner
-splits a comparison into series).
+Seven full request → response examples are in **[`examples/`](examples/)**; the six deterministic
+ones (including `07`, a too-broad distribution answered via the facet fast path) regenerate with
+`just examples` (the comparison example needs an LLM key, since only the LLM planner splits a
+comparison into series).
 
 ## Query & visualization coverage
 
@@ -210,6 +211,19 @@ with a compact field projection and counts in code. *Cost:* a broad query means 
 *Mitigations shipped:* a `count()` pre-flight, a too-broad refusal (below), and an on-disk response
 cache. *Production path:* periodically ingest ClinicalTrials.gov into a columnar store and aggregate
 there — turning O(pages) per query into a single indexed scan.
+
+### Facet fast path for too-broad distributions
+
+`engine/pipeline.py` (`_run_distribution_by_facets`). A *distribution* is always over a small
+controlled-vocab enum (≤14 values), and while the API can't facet a filtered query, it *can* count
+one exactly. So when a distribution matches more trials than the too-broad threshold, instead of
+refusing we issue **one server-side `count()` per enum value** (plus one "any value" count for the
+exact unclassified figure) — no paging. The result is an **exact** chart with sample-backed
+citations: *"breast cancer trials by phase"* (16k+ trials) went from a flat refusal to a real answer
+in ~8 tiny requests (see [`examples/07`](examples/07-distribution-too-broad.json)). *Cost:* the
+citations are a per-value sample rather than the full contributor set (disclosed in `meta`). *Why
+only distributions:* time trends, geography, and networks need the actual records, so they still
+refuse when too broad — the fast path applies exactly where the dimension is a closed vocabulary.
 
 ### Two-tool planner with validate-and-retry
 
@@ -312,7 +326,9 @@ and [`tools/eval/`](tools/eval).
 In priority order:
 
 1. **Entity resolution** via a medical ontology — the highest-leverage correctness win.
-2. **Ingestion store** for aggregation — removes the too-broad limit and the paging cost.
+2. **Ingestion store** for aggregation — removes the *remaining* too-broad limit (time trends,
+   geography, networks) and the paging cost. Distributions already sidestep it via the facet fast
+   path.
 3. **Self-consistency planning** — sample multiple plans and vote, to drive the mis-plan rate down.
 4. **Richer, still-verified citations** — character spans and NL excerpts checked against source.
 5. **More intents** — funnel/sankey for enrollment, survival-style timelines — each additive.

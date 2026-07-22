@@ -19,10 +19,14 @@ class Bucket:
     key: str
     label: str
     members: list[StudyRecord]
+    # Server-side total when the bucket comes from a facet count (the too-broad fast path), where
+    # ``members`` is only a citation sample. ``None`` for the normal path, where every member is
+    # present and the count *is* their number.
+    total: int | None = None
 
     @property
     def count(self) -> int:
-        return len(self.members)
+        return self.total if self.total is not None else len(self.members)
 
 
 def dimension_values(record: StudyRecord, dim: CategoricalDim) -> list[str]:

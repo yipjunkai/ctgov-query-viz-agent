@@ -52,6 +52,15 @@ _EXAMPLES: list[tuple[str, dict[str, Any]]] = [
             "condition": "melanoma",
         },
     ),
+    (
+        # High-volume condition (>10k trials): answered exactly via the facet fast path — one
+        # server-side count per phase instead of a too-broad refusal.
+        "07-distribution-too-broad",
+        {
+            "query": "How are breast cancer trials distributed across phases?",
+            "condition": "breast cancer",
+        },
+    ),
 ]
 
 
