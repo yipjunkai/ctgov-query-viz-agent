@@ -33,6 +33,9 @@ packages = ["src/ctgov_agent"]
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+# tools/eval holds reproducibility/analysis scripts, not shipped code — kept out of the strict gate,
+# consistent with pyright already scoping to src + tests only.
+extend-exclude = ["tools/eval"]
 
 [tool.ruff.lint]
 # Pragmatic-but-strict: pyflakes/pycodestyle + import-sort + bugbear + simplify + comprehensions.
