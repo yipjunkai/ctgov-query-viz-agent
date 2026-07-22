@@ -1,0 +1,219 @@
+[
+  {
+    "field": "protocolSection.designModule.phases",
+    "missingStudiesCount": 141060,
+    "piece": "Phase",
+    "topValues": [
+      {
+        "studiesCount": 232400,
+        "value": "NA"
+      },
+      {
+        "studiesCount": 89383,
+        "value": "PHASE2"
+      },
+      {
+        "studiesCount": 65140,
+        "value": "PHASE1"
+      },
+      {
+        "studiesCount": 49479,
+        "value": "PHASE3"
+      },
+      {
+        "studiesCount": 35545,
+        "value": "PHASE4"
+      },
+      {
+        "studiesCount": 6404,
+        "value": "EARLY_PHASE1"
+      }
+    ],
+    "type": "ENUM",
+    "uniqueValuesCount": 6
+  },
+  {
+    "field": "protocolSection.statusModule.overallStatus",
+    "missingStudiesCount": 0,
+    "piece": "OverallStatus",
+    "topValues": [
+      {
+        "studiesCount": 324913,
+        "value": "COMPLETED"
+      },
+      {
+        "studiesCount": 94347,
+        "value": "UNKNOWN"
+      },
+      {
+        "studiesCount": 65264,
+        "value": "RECRUITING"
+      },
+      {
+        "studiesCount": 33991,
+        "value": "TERMINATED"
+      },
+      {
+        "studiesCount": 28935,
+        "value": "NOT_YET_RECRUITING"
+      },
+      {
+        "studiesCount": 21933,
+        "value": "ACTIVE_NOT_RECRUITING"
+      },
+      {
+        "studiesCount": 16578,
+        "value": "WITHDRAWN"
+      },
+      {
+        "studiesCount": 5226,
+        "value": "ENROLLING_BY_INVITATION"
+      },
+      {
+        "studiesCount": 1747,
+        "value": "SUSPENDED"
+      },
+      {
+        "studiesCount": 979,
+        "value": "WITHHELD"
+      },
+      {
+        "studiesCount": 529,
+        "value": "NO_LONGER_AVAILABLE"
+      },
+      {
+        "studiesCount": 253,
+        "value": "AVAILABLE"
+      },
+      {
+        "studiesCount": 240,
+        "value": "APPROVED_FOR_MARKETING"
+      },
+      {
+        "studiesCount": 37,
+        "value": "TEMPORARILY_NOT_AVAILABLE"
+      }
+    ],
+    "type": "ENUM",
+    "uniqueValuesCount": 14
+  },
+  {
+    "field": "protocolSection.designModule.studyType",
+    "missingStudiesCount": 979,
+    "piece": "StudyType",
+    "topValues": [
+      {
+        "studiesCount": 454031,
+        "value": "INTERVENTIONAL"
+      },
+      {
+        "studiesCount": 138903,
+        "value": "OBSERVATIONAL"
+      },
+      {
+        "studiesCount": 1059,
+        "value": "EXPANDED_ACCESS"
+      }
+    ],
+    "type": "ENUM",
+    "uniqueValuesCount": 3
+  },
+  {
+    "field": "protocolSection.sponsorCollaboratorsModule.leadSponsor.class",
+    "missingStudiesCount": 979,
+    "piece": "LeadSponsorClass",
+    "topValues": [
+      {
+        "studiesCount": 425051,
+        "value": "OTHER"
+      },
+      {
+        "studiesCount": 131059,
+        "value": "INDUSTRY"
+      },
+      {
+        "studiesCount": 15766,
+        "value": "OTHER_GOV"
+      },
+      {
+        "studiesCount": 11557,
+        "value": "NIH"
+      },
+      {
+        "studiesCount": 4988,
+        "value": "NETWORK"
+      },
+      {
+        "studiesCount": 4909,
+        "value": "FED"
+      },
+      {
+        "studiesCount": 566,
+        "value": "INDIV"
+      },
+      {
+        "studiesCount": 94,
+        "value": "UNKNOWN"
+      },
+      {
+        "studiesCount": 3,
+        "value": "AMBIG"
+      }
+    ],
+    "type": "ENUM",
+    "uniqueValuesCount": 9
+  },
+  {
+    "field": "protocolSection.armsInterventionsModule.interventions.type",
+    "missingStudiesCount": 60197,
+    "piece": "InterventionType",
+    "topValues": [
+      {
+        "studiesCount": 210117,
+        "value": "DRUG"
+      },
+      {
+        "studiesCount": 122071,
+        "value": "OTHER"
+      },
+      {
+        "studiesCount": 74868,
+        "value": "DEVICE"
+      },
+      {
+        "studiesCount": 63154,
+        "value": "BEHAVIORAL"
+      },
+      {
+        "studiesCount": 59384,
+        "value": "PROCEDURE"
+      },
+      {
+        "studiesCount": 29735,
+        "value": "BIOLOGICAL"
+      },
+      {
+        "studiesCount": 19208,
+        "value": "DIAGNOSTIC_TEST"
+      },
+      {
+        "studiesCount": 17888,
+        "value": "DIETARY_SUPPLEMENT"
+      },
+      {
+        "studiesCount": 10600,
+        "value": "RADIATION"
+      },
+      {
+        "studiesCount": 3389,
+        "value": "COMBINATION_PRODUCT"
+      },
+      {
+        "studiesCount": 2857,
+        "value": "GENETIC"
+      }
+    ],
+    "type": "ENUM",
+    "uniqueValuesCount": 11
+  }
+]
