@@ -1,0 +1,40 @@
+name: Feature request
+description: A new query class, visualization type, or ergonomics improvement.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: What question about clinical trials are you trying to answer, and why does the current agent fall short?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What should it do? For a new query class, sketch the question → intent → visualization mapping.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: dropdown
+    id: scope
+    attributes:
+      label: How big a change?
+      options:
+        - "Small (~hours of work)"
+        - "Medium (~days)"
+        - "Large (~weeks)"
+        - "Not sure"
+    validations:
+      required: true
+  - type: checkboxes
+    id: willing
+    attributes:
+      label: Would you contribute the implementation?
+      options:
+        - label: "I'd like to open a PR for this myself."
+        - label: "I'd review or test a PR from someone else."
