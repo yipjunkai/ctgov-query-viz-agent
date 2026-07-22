@@ -1,7 +1,13 @@
 """Filters → CT.gov query params. The exact strings here were verified against the live API."""
 
-from ctgov_agent.engine.executor import build_query_params, combine_filters
-from ctgov_agent.planner.ir import Filters
+from ctgov_agent.engine.executor import (
+    build_query_params,
+    candidate_values,
+    combine_filters,
+    with_any_dimension_value,
+    with_dimension_value,
+)
+from ctgov_agent.planner.ir import CategoricalDim, Filters
 from ctgov_agent.vocab.controlled import InterventionType, Phase, SponsorClass, Status, StudyType
 
 
@@ -77,3 +83,29 @@ def test_combine_filters_overlays_series_onto_base() -> None:
     )
     assert combined.condition == "melanoma"  # shared base kept
     assert combined.intervention == "Nivolumab"  # series value wins
+
+
+def test_candidate_values_defaults_to_full_vocabulary() -> None:
+    values = candidate_values(Filters(condition="melanoma"), CategoricalDim.phase)
+    assert list(values) == list(Phase)  # no phase filter -> break down over every phase
+
+
+def test_candidate_values_respects_an_existing_filter() -> None:
+    # A distribution over phase that already pins two phases breaks down over only those.
+    values = candidate_values(Filters(phase=[Phase.PHASE2, Phase.PHASE3]), CategoricalDim.phase)
+    assert list(values) == [Phase.PHASE2, Phase.PHASE3]
+
+
+def test_with_dimension_value_narrows_to_one_value() -> None:
+    narrowed = with_dimension_value(Filters(condition="cancer"), CategoricalDim.phase, Phase.PHASE1)
+    assert narrowed.phase == [Phase.PHASE1]
+    assert narrowed.condition == "cancer"  # other filters preserved
+    assert build_query_params(narrowed)["filter.advanced"] == "AREA[Phase]PHASE1"
+
+
+def test_with_any_dimension_value_ors_all_candidate_values() -> None:
+    params = build_query_params(with_any_dimension_value(Filters(), CategoricalDim.study_type))
+    assert params["filter.advanced"] == (
+        "(AREA[StudyType]INTERVENTIONAL OR AREA[StudyType]OBSERVATIONAL OR "
+        "AREA[StudyType]EXPANDED_ACCESS)"
+    )

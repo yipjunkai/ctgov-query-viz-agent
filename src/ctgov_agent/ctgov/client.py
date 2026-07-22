@@ -106,6 +106,33 @@ class CtgovClient:
         total = data.get("totalCount")
         return total if isinstance(total, int) else 0
 
+    async def count_and_sample(
+        self,
+        query_params: Mapping[str, str],
+        sample_size: int,
+        fields: Sequence[str] = DEFAULT_FIELDS,
+    ) -> tuple[int, list[dict[str, Any]]]:
+        """Exact total plus up to ``sample_size`` record bodies in a single request (no paging).
+
+        Backs the too-broad distribution fast path: a value's count is the server-side total, and a
+        few sample records supply the deep citations without fetching the whole matching set.
+        """
+        params = {
+            **query_params,
+            "countTotal": "true",
+            "pageSize": str(max(1, sample_size)),
+            "fields": ",".join(fields),
+        }
+        data = await self._get("/studies", params)
+        total = data.get("totalCount")
+        batch = data.get("studies")
+        studies: list[dict[str, Any]] = []
+        if isinstance(batch, list):
+            for item in cast("list[Any]", batch):
+                if isinstance(item, dict):
+                    studies.append(cast("dict[str, Any]", item))
+        return (total if isinstance(total, int) else 0), studies
+
     async def search(
         self,
         query_params: Mapping[str, str],

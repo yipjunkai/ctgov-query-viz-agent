@@ -10,7 +10,13 @@ from ctgov_agent.api.app import app, get_pipeline
 from ctgov_agent.ctgov.client import CtgovClient
 from ctgov_agent.engine.pipeline import Pipeline
 from ctgov_agent.planner.base import FakePlanner, PlannerError
-from ctgov_agent.planner.ir import CategoricalDim, DistributionPlan, Filters, QueryPlan
+from ctgov_agent.planner.ir import (
+    CategoricalDim,
+    DistributionPlan,
+    Filters,
+    QueryPlan,
+    TimeTrendPlan,
+)
 
 _STUDIES = "https://clinicaltrials.gov/api/v2/studies"
 
@@ -59,16 +65,17 @@ def test_ambiguous_query_asks_for_clarification() -> None:
 
 
 def test_too_broad_query_is_refused_without_fetching() -> None:
-    plan = DistributionPlan(
-        intent="distribution", dimension=CategoricalDim.phase, filters=Filters()
-    )
+    # A time trend genuinely needs every record, so it still refuses when the set is too large —
+    # counted once, never paged. (Distributions instead take the facet fast path; see
+    # test_visualize_distribution.py::test_too_broad_distribution_uses_facet_fast_path.)
+    plan = TimeTrendPlan(intent="time_trend", filters=Filters())
     _override(lambda: Pipeline(FakePlanner(plan), CtgovClient(), too_broad_threshold=10))
     try:
         with respx.mock:
             route = respx.get(_STUDIES).mock(
                 return_value=httpx.Response(200, json={"totalCount": 99999, "studies": []})
             )
-            resp = TestClient(app).post("/visualize", json={"query": "all trials by phase"})
+            resp = TestClient(app).post("/visualize", json={"query": "all trials per year"})
     finally:
         app.dependency_overrides.clear()
     body = resp.json()

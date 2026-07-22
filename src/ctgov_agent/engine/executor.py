@@ -12,7 +12,14 @@ Two mechanisms, both verified against the live API:
 from collections.abc import Sequence
 from enum import StrEnum
 
-from ctgov_agent.planner.ir import Filters
+from ctgov_agent.planner.ir import CategoricalDim, Filters
+from ctgov_agent.vocab.controlled import (
+    InterventionType,
+    Phase,
+    SponsorClass,
+    Status,
+    StudyType,
+)
 
 
 def _append_enum_clause(clauses: list[str], area: str, values: Sequence[StrEnum] | None) -> None:
@@ -64,3 +71,52 @@ def build_query_params(filters: Filters) -> dict[str, str]:
     if advanced:
         params["filter.advanced"] = advanced
     return params
+
+
+# Each categorical dimension's controlled vocabulary and the Filters field that selects it. This is
+# what lets a too-broad distribution be answered with one server-side count per value instead of
+# paging every record (see the pipeline's facet fast path).
+_DIMENSION_VOCAB: dict[CategoricalDim, Sequence[StrEnum]] = {
+    CategoricalDim.phase: list(Phase),
+    CategoricalDim.status: list(Status),
+    CategoricalDim.study_type: list(StudyType),
+    CategoricalDim.sponsor_class: list(SponsorClass),
+    CategoricalDim.intervention_type: list(InterventionType),
+}
+_DIMENSION_FIELD: dict[CategoricalDim, str] = {
+    CategoricalDim.phase: "phase",
+    CategoricalDim.status: "status",
+    CategoricalDim.study_type: "study_type",
+    CategoricalDim.sponsor_class: "sponsor_class",
+    CategoricalDim.intervention_type: "intervention_type",
+}
+
+
+def _filter_values(filters: Filters, dim: CategoricalDim) -> Sequence[StrEnum] | None:
+    """The values a filter already constrains the dimension to, if any (typed, no ``getattr``)."""
+    if dim is CategoricalDim.phase:
+        return filters.phase
+    if dim is CategoricalDim.status:
+        return filters.status
+    if dim is CategoricalDim.study_type:
+        return filters.study_type
+    if dim is CategoricalDim.sponsor_class:
+        return filters.sponsor_class
+    return filters.intervention_type
+
+
+def candidate_values(filters: Filters, dim: CategoricalDim) -> Sequence[StrEnum]:
+    """The values to break a distribution down over: the filter's own values if it already
+    constrains the dimension, else the full controlled vocabulary."""
+    return _filter_values(filters, dim) or _DIMENSION_VOCAB[dim]
+
+
+def with_dimension_value(filters: Filters, dim: CategoricalDim, value: StrEnum) -> Filters:
+    """Narrow filters to a single value of the dimension (for that value's server-side count)."""
+    return filters.model_copy(update={_DIMENSION_FIELD[dim]: [value]})
+
+
+def with_any_dimension_value(filters: Filters, dim: CategoricalDim) -> Filters:
+    """Narrow filters to trials carrying *any* candidate value of the dimension — counting this set
+    gives the classified total, so ``matched - classified`` is the exact unclassified count."""
+    return filters.model_copy(update={_DIMENSION_FIELD[dim]: list(candidate_values(filters, dim))})

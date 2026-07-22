@@ -28,7 +28,14 @@ from ctgov_agent.engine.aggregate import (
     dimension_values,
     reconcile,
 )
-from ctgov_agent.engine.executor import build_query_params, combine_filters
+from ctgov_agent.engine.citations import CITATIONS_PER_DATUM
+from ctgov_agent.engine.executor import (
+    build_query_params,
+    candidate_values,
+    combine_filters,
+    with_any_dimension_value,
+    with_dimension_value,
+)
 from ctgov_agent.engine.network import build_network
 from ctgov_agent.engine.vizselect import (
     comparison_chart,
@@ -48,6 +55,7 @@ from ctgov_agent.planner.ir import (
     QueryPlan,
     TimeTrendPlan,
 )
+from ctgov_agent.vocab.controlled import humanize
 
 
 def _hints_from_request(req: VisualizeRequest) -> Filters:
@@ -217,21 +225,34 @@ class Pipeline:
         # which is the signal to add its branch.
         return await self._run_network(plan)
 
+    async def _page(self, filters: Filters) -> list[StudyRecord]:
+        """Page every matching study and parse it. No count guard — callers gate on the count."""
+        studies = await self._client.search(build_query_params(filters))
+        return [parse_study(study) for study in studies]
+
+    def _too_broad(self, total: int) -> RefusalSignal:
+        return RefusalSignal(
+            "too_broad",
+            f"About {total:,} trials match — too many to aggregate exactly. Add a filter "
+            f"(condition, drug, phase, or year range) to narrow the query.",
+            {"total": total, "threshold": self._too_broad_threshold},
+        )
+
     async def _fetch(self, filters: Filters) -> tuple[int, list[StudyRecord]]:
-        params = build_query_params(filters)
-        total = await self._client.count(params)
+        """Count pre-flight, then page all matches. Refuses above the threshold — used by the
+        intents that genuinely need every record (time trend, geographic, comparison, network)."""
+        total = await self._client.count(build_query_params(filters))
         if total > self._too_broad_threshold:
-            raise RefusalSignal(
-                "too_broad",
-                f"About {total:,} trials match — too many to aggregate exactly. Add a filter "
-                f"(condition, drug, phase, or year range) to narrow the query.",
-                {"total": total, "threshold": self._too_broad_threshold},
-            )
-        studies = await self._client.search(params)
-        return total, [parse_study(study) for study in studies]
+            raise self._too_broad(total)
+        return total, await self._page(filters)
 
     async def _run_distribution(self, plan: DistributionPlan) -> AgentResponse:
-        total, records = await self._fetch(plan.filters)
+        total = await self._client.count(build_query_params(plan.filters))
+        if total > self._too_broad_threshold:
+            # A distribution is over a small controlled-vocab enum, so instead of refusing we count
+            # each value server-side — exact, no paging. This retires the too-broad dead-end.
+            return await self._run_distribution_by_facets(plan, total)
+        records = await self._page(plan.filters)
         buckets = aggregate_by_dimension(records, plan.dimension)
         if not buckets:
             if records:
@@ -252,6 +273,57 @@ class Pipeline:
                 assumptions=_reconciliation_notes(rec, len(records), noun, "breakdown"),
             ),
         )
+
+    async def _run_distribution_by_facets(
+        self, plan: DistributionPlan, total: int
+    ) -> AgentResponse:
+        """Too-broad distribution via one server-side count per value (no full paging).
+
+        Each value's count is the API's exact ``totalCount`` for that filtered slice; a few sample
+        records per value back the deep citations. One extra "any value" count yields the exact
+        classified total, so the reconciliation stays honest.
+        """
+        dim = plan.dimension
+        buckets: list[Bucket] = []
+        for value in candidate_values(plan.filters, dim):
+            params = build_query_params(with_dimension_value(plan.filters, dim, value))
+            count, sample = await self._client.count_and_sample(params, CITATIONS_PER_DATUM)
+            if count == 0:
+                continue
+            buckets.append(
+                Bucket(
+                    key=value.value,
+                    label=humanize(value.value),
+                    members=[parse_study(study) for study in sample],
+                    total=count,
+                )
+            )
+        if not buckets:
+            return _no_data(_missing_dimension_message(dim, total))
+        classified = await self._client.count(
+            build_query_params(with_any_dimension_value(plan.filters, dim))
+        )
+        viz, sort_desc = distribution_chart(plan, buckets)
+        bar_sum = sum(bucket.count for bucket in buckets)
+        rec = Reconciliation(unclassified=total - classified, multivalue=bar_sum > classified)
+        noun = dim.value.replace("_", " ")
+        assumptions = [
+            f"This query matches {total:,} trials — too many to page individually. Each {noun} "
+            f"count is an exact server-side total; the deep citations are a small per-value "
+            f"sample.",
+            *_reconciliation_notes(rec, total, noun, "breakdown"),
+        ]
+        meta = Meta(
+            total_trials_matched=total,
+            trials_aggregated=total,
+            trials_unclassified=rec.unclassified,
+            filters_applied=plan.filters.model_dump(mode="json", exclude_none=True),
+            query_interpretation=plan.notes,
+            sort=sort_desc,
+            assumptions=assumptions,
+            truncated=False,
+        )
+        return OkResponse(visualization=viz, meta=meta)
 
     async def _run_time_trend(self, plan: TimeTrendPlan) -> AgentResponse:
         total, records = await self._fetch(plan.filters)
