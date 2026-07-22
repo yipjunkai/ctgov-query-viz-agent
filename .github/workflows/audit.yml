@@ -1,0 +1,40 @@
+name: audit
+
+# Dependency-tree vulnerability audit. Unlike the PR-scoped dependency-review in
+# security.yml, this can go red when a NEW advisory is published against an
+# already-locked dependency — so it runs on a schedule, plus dependency-file
+# changes.
+
+on:
+  schedule:
+    - cron: "0 5 * * *" # daily
+  push:
+    branches: [main]
+    paths:
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/audit.yml"
+  pull_request:
+    paths:
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pip-audit:
+    name: pip-audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+      - name: Export the locked runtime dependency tree
+        run: uv export --frozen --no-dev --no-emit-project --format requirements-txt -o requirements.txt
+      - name: Audit against the advisory database
+        run: uvx pip-audit -r requirements.txt --strict

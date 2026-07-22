@@ -1,0 +1,62 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+        with:
+          enable-cache: true
+      # --locked also asserts uv.lock is in sync with pyproject.toml, so a stale
+      # lockfile fails the PR here rather than drifting silently.
+      - run: uv sync --locked
+      # Mirrors `just verify` (the local gate) without a just-in-CI dependency.
+      - name: ruff format
+        run: uv run --no-sync ruff format --check .
+      - name: ruff check
+        run: uv run --no-sync ruff check .
+      - name: pyright (strict)
+        run: uv run --no-sync pyright
+      - name: pytest
+        run: uv run --no-sync pytest
+
+  ci-passed:
+    # Single check that branch protection can require, instead of listing each
+    # job by name. Succeeds only if all needed jobs succeeded; fails if any
+    # failed or was cancelled. Runs even on partial failures because
+    # `if: always()` is set. Stays correct as jobs are added.
+    name: ci-passed
+    if: ${{ always() }}
+    needs: [verify]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Aggregate required-job results
+        env:
+          NEEDS_RESULT: ${{ toJSON(needs) }}
+        run: |
+          set -e
+          echo "$NEEDS_RESULT" | jq -r 'to_entries[] | "\(.key)\t\(.value.result)"'
+          if echo "$NEEDS_RESULT" | jq -e 'to_entries[] | select(.value.result == "failure" or .value.result == "cancelled")' > /dev/null; then
+            echo "::error::At least one required job failed or was cancelled."
+            exit 1
+          fi
+          echo "All required jobs passed."
