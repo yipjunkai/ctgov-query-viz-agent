@@ -7,8 +7,8 @@ dimension is phase and by descending count otherwise.
 
 from ctgov_agent.api.schemas import Channel, ChartVisualization, DataPoint, Encoding, VizType
 from ctgov_agent.engine.aggregate import Bucket
-from ctgov_agent.planner.ir import CategoricalDim, DistributionPlan, Filters
-from ctgov_agent.vocab.controlled import Phase
+from ctgov_agent.planner.ir import CategoricalDim, ComparisonPlan, DistributionPlan, Filters
+from ctgov_agent.vocab.controlled import Phase, humanize
 
 _DIM_LABEL: dict[CategoricalDim, str] = {
     CategoricalDim.phase: "Phase",
@@ -57,3 +57,80 @@ def distribution_chart(
         data=[DataPoint(key=b.key, label=b.label, value=b.count) for b in ordered],
     )
     return viz, sort_desc
+
+
+def time_series_chart(filters: Filters, buckets: list[Bucket]) -> tuple[ChartVisualization, str]:
+    """Trials-per-year line, with intervening zero-years filled so the axis is continuous."""
+    by_year = {int(b.key): b for b in buckets}
+    years = sorted(by_year)
+    data: list[DataPoint] = []
+    for year in range(years[0], years[-1] + 1):
+        bucket = by_year.get(year)
+        data.append(
+            DataPoint(
+                key=str(year),
+                label=str(year),
+                value=bucket.count if bucket is not None else 0,
+            )
+        )
+    viz = ChartVisualization(
+        type=VizType.time_series,
+        title=f"Trials per year{_title_suffix(filters)}",
+        encoding=Encoding(
+            x=Channel(field="key", label="Start year"),
+            y=Channel(field="value", label="Trial count"),
+        ),
+        data=data,
+    )
+    return viz, "year asc"
+
+
+def geographic_chart(filters: Filters, buckets: list[Bucket]) -> tuple[ChartVisualization, str]:
+    """Choropleth-ready counts by country, ordered by descending count."""
+    ordered = sorted(buckets, key=lambda b: b.count, reverse=True)
+    viz = ChartVisualization(
+        type=VizType.choropleth,
+        title=f"Trials by country{_title_suffix(filters)}",
+        encoding=Encoding(
+            x=Channel(field="key", label="Country"),
+            y=Channel(field="value", label="Trial count"),
+        ),
+        data=[DataPoint(key=b.key, label=b.label, value=b.count) for b in ordered],
+    )
+    return viz, "value desc"
+
+
+def _ordered_keys(dim: CategoricalDim, series_results: list[tuple[str, list[Bucket]]]) -> list[str]:
+    totals: dict[str, int] = {}
+    for _label, buckets in series_results:
+        for bucket in buckets:
+            totals[bucket.key] = totals.get(bucket.key, 0) + bucket.count
+    if dim is CategoricalDim.phase:
+        return sorted(totals, key=lambda k: _PHASE_ORDER.get(k, len(_PHASE_ORDER)))
+    return sorted(totals, key=lambda k: totals[k], reverse=True)
+
+
+def comparison_chart(
+    plan: ComparisonPlan, series_results: list[tuple[str, list[Bucket]]]
+) -> tuple[ChartVisualization, str]:
+    """Grouped bar comparing named series across the plan's categorical dimension."""
+    dim_label = _DIM_LABEL[plan.dimension]
+    data: list[DataPoint] = []
+    for key in _ordered_keys(plan.dimension, series_results):
+        for label, buckets in series_results:
+            match = next((b for b in buckets if b.key == key), None)
+            if match is not None:
+                data.append(
+                    DataPoint(key=key, label=humanize(key), value=match.count, series=label)
+                )
+    viz = ChartVisualization(
+        type=VizType.grouped_bar,
+        title=f"Trials by {dim_label}: {' vs '.join(label for label, _ in series_results)}",
+        encoding=Encoding(
+            x=Channel(field="key", label=dim_label),
+            y=Channel(field="value", label="Trial count"),
+            series=Channel(field="series", label="Series"),
+        ),
+        data=data,
+    )
+    return viz, "grouped by series"

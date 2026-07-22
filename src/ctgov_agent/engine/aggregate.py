@@ -45,3 +45,24 @@ def aggregate_by_dimension(records: list[StudyRecord], dim: CategoricalDim) -> l
     return [
         Bucket(key=key, label=humanize(key), members=members) for key, members in grouped.items()
     ]
+
+
+def aggregate_by_year(records: list[StudyRecord]) -> list[Bucket]:
+    """Group by start year. Records with no parseable start date are excluded (reported in meta)."""
+    grouped: dict[str, list[StudyRecord]] = {}
+    for record in records:
+        if record.start_year is None:
+            continue
+        grouped.setdefault(str(record.start_year), []).append(record)
+    return [Bucket(key=year, label=year, members=members) for year, members in grouped.items()]
+
+
+def aggregate_by_country(records: list[StudyRecord]) -> list[Bucket]:
+    """Group by country; a multi-country trial counts once per distinct country."""
+    grouped: dict[str, list[StudyRecord]] = {}
+    for record in records:
+        for country in dict.fromkeys(record.countries):
+            grouped.setdefault(country, []).append(record)
+    return [
+        Bucket(key=country, label=country, members=members) for country, members in grouped.items()
+    ]

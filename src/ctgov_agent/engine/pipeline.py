@@ -15,16 +15,28 @@ from ctgov_agent.api.schemas import (
     VisualizeRequest,
 )
 from ctgov_agent.ctgov.client import DEFAULT_MAX_RECORDS, CtgovClient
-from ctgov_agent.ctgov.models import parse_study
-from ctgov_agent.engine.aggregate import aggregate_by_dimension
-from ctgov_agent.engine.executor import build_query_params
-from ctgov_agent.engine.vizselect import distribution_chart
+from ctgov_agent.ctgov.models import StudyRecord, parse_study
+from ctgov_agent.engine.aggregate import (
+    Bucket,
+    aggregate_by_country,
+    aggregate_by_dimension,
+    aggregate_by_year,
+)
+from ctgov_agent.engine.executor import build_query_params, combine_filters
+from ctgov_agent.engine.vizselect import (
+    comparison_chart,
+    distribution_chart,
+    geographic_chart,
+    time_series_chart,
+)
 from ctgov_agent.planner.base import Planner, PlannerError
 from ctgov_agent.planner.ir import (
     ComparisonPlan,
     DistributionPlan,
     Filters,
+    GeographicPlan,
     QueryPlan,
+    TimeTrendPlan,
 )
 
 
@@ -67,6 +79,25 @@ def _merge_hints(plan: QueryPlan, req: VisualizeRequest) -> QueryPlan:
     return plan.model_copy(update={"filters": merged})
 
 
+def _build_meta(
+    total: int, records: list[StudyRecord], filters: Filters, notes: str | None, sort: str
+) -> Meta:
+    return Meta(
+        total_trials_matched=total,
+        trials_aggregated=len(records),
+        filters_applied=filters.model_dump(mode="json", exclude_none=True),
+        query_interpretation=notes,
+        sort=sort,
+        truncated=len(records) >= DEFAULT_MAX_RECORDS,
+    )
+
+
+def _no_data(
+    message: str = "No trials matched the query, so there is nothing to visualize.",
+) -> RefusedResponse:
+    return RefusedResponse(reason="no_data", message=message)
+
+
 class Pipeline:
     def __init__(self, planner: Planner, client: CtgovClient) -> None:
         self._planner = planner
@@ -90,29 +121,79 @@ class Pipeline:
     async def _dispatch(self, plan: QueryPlan) -> AgentResponse:
         if isinstance(plan, DistributionPlan):
             return await self._run_distribution(plan)
+        if isinstance(plan, TimeTrendPlan):
+            return await self._run_time_trend(plan)
+        if isinstance(plan, GeographicPlan):
+            return await self._run_geographic(plan)
+        if isinstance(plan, ComparisonPlan):
+            return await self._run_comparison(plan)
         return RefusedResponse(
             reason="unsupported_intent",
             message=f"The '{plan.intent}' intent is not yet supported.",
         )
 
-    async def _run_distribution(self, plan: DistributionPlan) -> AgentResponse:
-        params = build_query_params(plan.filters)
+    async def _fetch(self, filters: Filters) -> tuple[int, list[StudyRecord]]:
+        params = build_query_params(filters)
         total = await self._client.count(params)
         studies = await self._client.search(params)
-        records = [parse_study(study) for study in studies]
+        return total, [parse_study(study) for study in studies]
+
+    async def _run_distribution(self, plan: DistributionPlan) -> AgentResponse:
+        total, records = await self._fetch(plan.filters)
         buckets = aggregate_by_dimension(records, plan.dimension)
         if not buckets:
-            return RefusedResponse(
-                reason="no_data",
-                message="No trials matched the query, so there is nothing to visualize.",
-            )
+            return _no_data()
         viz, sort_desc = distribution_chart(plan, buckets)
+        return OkResponse(
+            visualization=viz, meta=_build_meta(total, records, plan.filters, plan.notes, sort_desc)
+        )
+
+    async def _run_time_trend(self, plan: TimeTrendPlan) -> AgentResponse:
+        total, records = await self._fetch(plan.filters)
+        buckets = aggregate_by_year(records)
+        if not buckets:
+            return _no_data("No trials with a known start date matched the query.")
+        viz, sort_desc = time_series_chart(plan.filters, buckets)
+        return OkResponse(
+            visualization=viz, meta=_build_meta(total, records, plan.filters, plan.notes, sort_desc)
+        )
+
+    async def _run_geographic(self, plan: GeographicPlan) -> AgentResponse:
+        total, records = await self._fetch(plan.filters)
+        buckets = aggregate_by_country(records)
+        if not buckets:
+            return _no_data("No trials with a known location matched the query.")
+        viz, sort_desc = geographic_chart(plan.filters, buckets)
+        return OkResponse(
+            visualization=viz, meta=_build_meta(total, records, plan.filters, plan.notes, sort_desc)
+        )
+
+    async def _run_comparison(self, plan: ComparisonPlan) -> AgentResponse:
+        series_results: list[tuple[str, list[Bucket]]] = []
+        aggregated = 0
+        for series in plan.series:
+            filters = combine_filters(plan.base_filters, series.filters)
+            _total, records = await self._fetch(filters)
+            aggregated += len(records)
+            series_results.append((series.label, aggregate_by_dimension(records, plan.dimension)))
+        if all(not buckets for _label, buckets in series_results):
+            return _no_data()
+        viz, sort_desc = comparison_chart(plan, series_results)
         meta = Meta(
-            total_trials_matched=total,
-            trials_aggregated=len(records),
-            filters_applied=plan.filters.model_dump(mode="json", exclude_none=True),
+            total_trials_matched=aggregated,
+            trials_aggregated=aggregated,
+            filters_applied={
+                "base": plan.base_filters.model_dump(mode="json", exclude_none=True),
+                "series": [
+                    {
+                        "label": s.label,
+                        "filters": s.filters.model_dump(mode="json", exclude_none=True),
+                    }
+                    for s in plan.series
+                ],
+            },
             query_interpretation=plan.notes,
             sort=sort_desc,
-            truncated=len(studies) >= DEFAULT_MAX_RECORDS,
+            truncated=False,
         )
         return OkResponse(visualization=viz, meta=meta)

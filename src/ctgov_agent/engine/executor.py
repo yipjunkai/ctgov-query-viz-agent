@@ -42,6 +42,11 @@ def _build_advanced(filters: Filters) -> str:
     return " AND ".join(clauses)
 
 
+def combine_filters(base: Filters, override: Filters) -> Filters:
+    """Overlay a comparison series' filters onto the shared base filters (series values win)."""
+    return base.model_copy(update=override.model_dump(exclude_none=True))
+
+
 def build_query_params(filters: Filters) -> dict[str, str]:
     """Build the CT.gov ``/studies`` query params for a filter set (no pagination/projection)."""
     params: dict[str, str] = {}
