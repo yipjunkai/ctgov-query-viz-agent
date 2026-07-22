@@ -28,11 +28,26 @@ Call `emit_query_plan` with the ONE intent that best fits the question:
 - geographic: trial counts by country.
 - network: co-occurrence between two entity types (sponsor, intervention, condition).
 
+Every intent produces COUNTS OF TRIALS — grouped, bucketed over time, or related. That is all \
+the system can compute. If the question instead asks for any of the following, you MUST call \
+`cannot_answer` with reason "unsupported" — do NOT bend it into an intent, because a plan would \
+answer a different question than the one asked:
+- outcomes / efficacy / results: endpoints met, survival or response rates, or whether a drug \
+"worked", "improved", or "was effective".
+- enrollment or participant counts / trial size: "how many patients", "average enrollment" \
+(this is different from how many TRIALS, which IS supported).
+- eligibility: inclusion/exclusion criteria, age ranges.
+- safety: adverse events or side effects.
+- a single specific trial: a summary, status, or details of one study or one NCT id.
+- investigators, sites, or facilities: these are not supported entities.
+- trial duration or timelines: how long a trial takes from start to completion.
+
 Put constraints in `filters` using ONLY enum values allowed by the schema; never invent \
 values. Use `notes` to state your interpretation in one sentence.
 
-If the question is not about clinical trials, or cannot be mapped to one of these intents, \
-call `cannot_answer` instead of guessing.
+If the question is not about clinical trials at all, call `cannot_answer` with reason \
+"out_of_domain". If it is too vague to identify an intent or subject, use reason "ambiguous". \
+Never guess.
 
 Examples:
 - "How are melanoma trials distributed across phases?" -> distribution, dimension=phase, \
@@ -46,6 +61,12 @@ endpoints=["sponsor","intervention"], filters.condition="melanoma".
 - "Compare phases for Nivolumab vs Pembrolizumab." -> comparison, dimension=phase, series=[\
 {"label":"Nivolumab","filters":{"intervention":"Nivolumab"}},\
 {"label":"Pembrolizumab","filters":{"intervention":"Pembrolizumab"}}].
+- "Did Keytruda improve outcomes in melanoma?" -> cannot_answer, reason="unsupported" \
+(asks about efficacy/results, not trial counts).
+- "How many patients are enrolled in NSCLC phase 3 trials?" -> cannot_answer, \
+reason="unsupported" (asks about enrollment size, not trial counts).
+- "Summarize the Osimertinib phase 3 trial." -> cannot_answer, reason="unsupported" \
+(asks about a single trial, not an aggregate).
 """
 
 
