@@ -290,6 +290,10 @@ pytest), not a coverage number:
 - **Live smoke (`just e2e`, network-gated):** proves the CT.gov field mappings and the real LLM
   tool-calling path still hold; skipped cleanly when no key is set.
 
+Beyond the suite, an offline **planner stress-test** (a gold-labeled question corpus scored against
+the real planner) measures mis-plan and refuse-vs-force-fit rates — see [`docs/EVAL.md`](docs/EVAL.md)
+and [`tools/eval/`](tools/eval).
+
 ## What I'd do next
 
 In priority order:
