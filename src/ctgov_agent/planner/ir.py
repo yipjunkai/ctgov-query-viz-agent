@@ -108,8 +108,8 @@ class DistributionPlan(_Plan):
 
 
 class TimeTrendPlan(_Plan):
-    """Trial counts bucketed by start year (time series). Granularity is fixed to year — see
-    DESIGN.md; month is a documented extension."""
+    """Trial counts bucketed by start year (time series). Granularity is fixed to year; month is a
+    documented extension (see the README's design section)."""
 
     intent: Literal["time_trend"]
     filters: Filters = Field(default_factory=Filters)
