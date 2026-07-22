@@ -1,148 +1,18 @@
 # ClinicalTrials.gov Query-to-Visualization Agent
 
-A backend service that turns natural-language questions about clinical trials into **structured
-visualization specifications**, backed by live [ClinicalTrials.gov](https://clinicaltrials.gov/data-api/api)
-data.
+[![CI](https://github.com/yipjunkai/ctgov-query-viz-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/yipjunkai/ctgov-query-viz-agent/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/yipjunkai/ctgov-query-viz-agent/badge)](https://scorecard.dev/viewer/?uri=github.com/yipjunkai/ctgov-query-viz-agent)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](#-license)
+[![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
 
-> **Core principle: the LLM plans; deterministic code computes.** The model translates a question
-> into a validated query plan and never emits a data value — so every count, bucket, and citation
-> comes from real API records, not the model's imagination. The agent would rather **refuse** than
-> answer wrong.
-
-This README is the full write-up: how to run it, the request/response contract, and — the part that
-matters most — **every non-trivial design decision, what it costs, and the production path** I'd take
-with more time. The interesting part of a system isn't that it works; it's knowing exactly where it
-stops working and what you'd do next.
-
-## Table of contents
-
-1. [Architecture](#architecture)
-2. [Quick start](#quick-start)
-3. [Demo](#demo)
-4. [Request schema](#request-schema)
-5. [Response schema](#response-schema)
-6. [Query & visualization coverage](#query--visualization-coverage)
-7. [Design decisions, costs, and production paths](#design-decisions-costs-and-production-paths)
-8. [Entity resolution: a corrected assumption](#entity-resolution-a-corrected-assumption)
-9. [Testing](#testing)
-10. [What I'd do next](#what-id-do-next)
-11. [AI tool usage (integrity note)](#ai-tool-usage-integrity-note)
-12. [Project structure](#project-structure)
-
-## Architecture
-
-The scoring for this kind of system weights system design and agent design far above raw code, and
-the one hard requirement is *don't hallucinate — it's fine to say a query can't be processed*. Both
-point to a single idea:
-
-> The LLM is confined to **translating** a question into a validated **query plan**. It never sees a
-> record, never emits a count, never writes a citation. Every number in the output is computed by
-> deterministic code from real ClinicalTrials.gov records.
-
-The model *cannot* fabricate a trial count because it never produces one. This turns
-"don't hallucinate" from a prompt-engineering hope into a structural property.
-
-```
-NL query (+ optional structured fields)
-  │
-  ▼  LLM planner ── OpenAI-compatible, tool-calling, Pydantic-validated
-QueryPlan (intent-discriminated IR)
-  │
-  ▼  guardrails ── unmappable / out-of-domain / too-broad → typed refusal
-  ▼  executor   ── IR filters → CT.gov v2 query params (verified Essie syntax)
-  ▼  client     ── count() pre-check, then page all matches (pageToken @ 1000)
-  ▼  aggregate  ── deterministic group / bucket / co-occurrence  (pure, Counter-based)
-  ▼  vizselect  ── (intent, shape) → visualization type + encoding
-  ▼  citations  ── attach + verify exact-value excerpts
-  │
-  ▼
-{ status: ok | refused | needs_clarification, visualization, meta }
-```
-
-The LLM appears once, at the top; everything after is pure, testable code. That is the seam the
-whole design is organized around: **backend owns all logic, the LLM is a thin adapter at the
-boundary, and the response schema is a fixed contract.**
-
-## Quick start
-
-Requires [`uv`](https://docs.astral.sh/uv/) and Python 3.12+.
-
-```sh
-uv sync                      # create .venv and install deps
-just verify                  # single green gate: ruff + strict pyright + tests
-just run                     # start the API on http://127.0.0.1:8000
-```
-
-**Zero-setup:** with no API key configured the service uses a deterministic rule-based planner, so
-it runs with no secrets. To use the LLM planner, copy `.env.example` → `.env` and set a key:
-
-```sh
-cp .env.example .env         # then set OPENROUTER_API_KEY (preferred) or OPENAI_API_KEY
-```
-
-Try it:
+**Ask about clinical trials in plain English; get back a validated chart specification grounded in live [ClinicalTrials.gov](https://clinicaltrials.gov/data-api/api) records.** The model plans. Deterministic code computes. Every number is cited back to a real trial — or the agent refuses.
 
 ```sh
 curl -s localhost:8000/visualize -H 'content-type: application/json' \
-  -d '{"query": "How are melanoma trials distributed across phases?", "condition": "melanoma"}' | jq
+  -d '{"query": "How are melanoma trials distributed across phases?", "condition": "melanoma"}'
 ```
 
-## Demo
-
-`just run`, then open **http://127.0.0.1:8000/** for a self-contained page: type a question (or click
-an example chip), and it renders the response — charts via **Vega-Lite**, the network via a **Vega
-force-directed** graph — plus the response metadata and the deep-citation table. It's a pure consumer
-of the `/visualize` contract (no backend rendering logic), which is itself the proof the schema is
-frontend-friendly. The page loads Vega from a CDN, so it needs internet for the rendering libs (the
-API and data path don't).
-
-## Request schema
-
-`POST /visualize` — `query` is required; the optional structured fields, when supplied,
-**deterministically override** the planner (explicit user input never depends on the LLM).
-
-| Field        | Type       | Required | Notes                                                     |
-|--------------|------------|----------|-----------------------------------------------------------|
-| `query`      | string     | yes      | The natural-language question.                            |
-| `drug_name`  | string     | no       | Intervention filter (`query.intr`).                       |
-| `condition`  | string     | no       | Condition / disease (`query.cond`).                       |
-| `sponsor`    | string     | no       | Lead sponsor name (`query.spons`).                        |
-| `phase`      | string[]   | no       | Enum: `NA, EARLY_PHASE1, PHASE1, PHASE2, PHASE3, PHASE4`. |
-| `country`    | string     | no       | Location country (`query.locn`).                          |
-| `start_year` | integer    | no       | Earliest trial start year.                                |
-| `end_year`   | integer    | no       | Latest trial start year.                                  |
-
-## Response schema
-
-Every response is a discriminated union on `status`:
-
-- **`ok`** → `{ status, visualization, meta }`
-- **`refused`** → `{ status, reason, message, detail }` — `reason` ∈ `out_of_domain, unsupported,
-  too_broad, no_data, upstream_error, planner_failed`.
-- **`needs_clarification`** → `{ status, question, detail }` — the query was ambiguous.
-
-The **`visualization`** is itself discriminated on `kind`:
-
-- **`chart`** (`bar_chart`, `time_series`, `grouped_bar`, `choropleth`):
-  `{ kind, type, title, encoding: {x, y, series?}, data: [DataPoint] }`
-  where `DataPoint = { key, label, value, series?, citations: [Citation] }`.
-- **`network`** (`network_graph`):
-  `{ kind, type, title, encoding: NetworkEncoding, nodes: [Node], edges: [Edge] }`
-  where `Node = { id, label, kind, value }` and `Edge = { source, target, weight, citations }`.
-
-**`Citation` = `{ nct_id, excerpt, field }`** — `excerpt` is the exact value from `field` that
-supports the datum, and is a verified substring of the source record.
-
-**`meta`** = `{ source, total_trials_matched, trials_aggregated, trials_unclassified,
-filters_applied, query_interpretation, units, sort, assumptions, advisories, resolved_entities,
-truncated }`.
-`trials_unclassified` and `assumptions` reconcile the bars against the trial total; `advisories`
-flag a degenerate-but-valid chart; `resolved_entities` reports any canonicalized drug names (all
-below).
-
-Example `ok` response (trimmed):
-
-```json
+```jsonc
 {
   "status": "ok",
   "visualization": {
@@ -150,276 +20,299 @@ Example `ok` response (trimmed):
     "encoding": { "x": {"field": "key", "label": "Phase"},
                   "y": {"field": "value", "label": "Trial count"} },
     "data": [
-      { "key": "PHASE2", "label": "Phase 2", "value": 1528, "series": null,
-        "citations": [ {"nct_id": "NCT04...", "excerpt": "PHASE2", "field": "phase"} ] }
+      { "key": "PHASE2", "label": "Phase 2", "value": 1528,
+        "citations": [{"nct_id": "NCT06896552", "excerpt": "PHASE2", "field": "phase"}] }
+      // ...one datum per phase, each with sample citations
     ]
   },
   "meta": {
-    "source": "clinicaltrials.gov", "total_trials_matched": 3736, "trials_aggregated": 3736,
-    "filters_applied": {"condition": "melanoma"}, "sort": "canonical phase order", "truncated": false
+    "total_trials_matched": 3736, "trials_unclassified": 632, "sort": "canonical phase order",
+    "assumptions": ["632 of 3,736 trials report no phase and are excluded from the breakdown.", ...]
   }
 }
 ```
 
-Seven full request → response examples are in **[`examples/`](examples/)**; the six deterministic
-ones (including `07`, a too-broad distribution answered via the facet fast path) regenerate with
-`just examples` (the comparison example needs an LLM key, since only the LLM planner splits a
-comparison into series).
+## ⚡ How it works
 
-## Query & visualization coverage
+The whole system is organized around one principle:
 
-| Question class    | Intent         | Visualization   | Example                                            |
-|-------------------|----------------|-----------------|----------------------------------------------------|
-| Distribution      | `distribution` | `bar_chart`     | "trials by phase / status / sponsor type"          |
-| Time trend        | `time_trend`   | `time_series`   | "trials per year since 2015"                       |
-| Comparison        | `comparison`   | `grouped_bar`   | "compare phases for Drug A vs Drug B"              |
-| Geographic        | `geographic`   | `choropleth`    | "which countries have the most trials"             |
-| Relationship      | `network`      | `network_graph` | "network of sponsors ↔ drugs; drug ↔ drug"         |
+> **The LLM is confined to translating a question into a validated query plan.** It never sees a
+> record, never emits a count, never writes a citation. Every number in the output is computed by
+> deterministic code from real ClinicalTrials.gov records.
 
-All five run through one engine — a new class is a new IR variant + one aggregation + one viz
-mapping. (The no-key rule planner covers all but comparison; comparison needs the LLM planner.)
+The model *cannot* fabricate a trial count because it never produces one. That turns "don't
+hallucinate" from a prompt-engineering hope into a structural property — the model's only output is a
+typed plan, and anything off-target fails validation instead of reaching the user as a wrong answer.
 
-## Design decisions, costs, and production paths
+```text
+NL query (+ optional structured fields)
+  │
+  ▼  planner    ── OpenAI-compatible tool-calling, Pydantic-validated (rule-based fallback, no key)
+QueryPlan (intent-discriminated IR)
+  │
+  ▼  guardrails ── unmappable / out-of-domain / too-broad → typed refusal
+  ▼  executor   ── IR filters → CT.gov v2 query params (verified Essie syntax)
+  ▼  client     ── count() pre-flight, then page every match (pageToken @ 1000)
+  ▼  aggregate  ── deterministic group / bucket / co-occurrence (pure, Counter-based)
+  ▼  vizselect  ── (intent, shape) → visualization type + encoding
+  ▼  citations  ── attach + verify exact-value excerpts against the source record
+  │
+  ▼
+{ status: ok | refused | needs_clarification, visualization, meta }
+```
 
-This section states every non-trivial decision, what it costs, and the production path I'd take with
-more time.
+The LLM appears once, at the top. Everything after it is pure, testable code. That is the seam the
+design is built on: **the backend owns all logic, the LLM is a thin adapter at the boundary, and the
+response schema is a fixed contract** a frontend can implement against.
 
-### Intent-discriminated IR
+## 🚀 Quick start
 
-`planner/ir.py`. The plan is a Pydantic discriminated union —
+Requires [`uv`](https://docs.astral.sh/uv/) and Python 3.12+.
+
+```sh
+uv sync         # create .venv and install deps
+just verify     # the single green gate: ruff + strict pyright + tests (no network)
+just run        # start the API on http://127.0.0.1:8000
+```
+
+**Runs with zero secrets.** With no API key configured the service uses a deterministic rule-based
+planner, so it comes up and answers the structured-field queries out of the box. To enable the LLM
+planner (needed for free-text entity extraction and multi-series comparisons), drop a key into
+`.env`:
+
+```sh
+cp .env.example .env    # then set OPENROUTER_API_KEY (preferred) or OPENAI_API_KEY
+```
+
+Then ask it something:
+
+```sh
+curl -s localhost:8000/visualize -H 'content-type: application/json' \
+  -d '{"query": "trials per year for pembrolizumab since 2015", "drug_name": "pembrolizumab"}' | jq
+```
+
+## 🎬 Demo
+
+`just run`, then open **http://127.0.0.1:8000/**. Type a question (or click an example chip) and the
+page renders the response — charts via **Vega-Lite**, the co-occurrence network via a **Vega
+force-directed** graph — alongside the response metadata and the citation table. It's a pure consumer
+of the `/visualize` contract with no rendering logic of its own, which is itself the proof that the
+schema is frontend-friendly. (It pulls the Vega libraries from a CDN, so the *page* needs internet;
+the API and data path don't.)
+
+## 📚 The `/visualize` contract
+
+`POST /visualize` — `query` is required. `GET /` serves the demo; `GET /health` is a liveness probe.
+
+### Request
+
+`query` is the only required field. Any structured field you supply **deterministically overrides**
+the planner — explicit user input never depends on the LLM.
+
+| Field        | Type       | Notes                                                     |
+|--------------|------------|-----------------------------------------------------------|
+| `query`      | string     | The natural-language question. **Required.**              |
+| `drug_name`  | string     | Intervention filter (`query.intr`).                       |
+| `condition`  | string     | Condition / disease (`query.cond`).                       |
+| `sponsor`    | string     | Lead sponsor name (`query.spons`).                        |
+| `phase`      | string[]   | Enum: `NA, EARLY_PHASE1, PHASE1, PHASE2, PHASE3, PHASE4`. |
+| `country`    | string     | Location country (`query.locn`).                          |
+| `start_year` | integer    | Earliest trial start year.                                |
+| `end_year`   | integer    | Latest trial start year.                                  |
+
+### Response
+
+Every response is a discriminated union on `status`:
+
+- **`ok`** → `{ status, visualization, meta }`
+- **`refused`** → `{ status, reason, message, detail }` — `reason` ∈ `out_of_domain, unsupported,
+  too_broad, no_data, upstream_error, planner_failed`. Refusal is a first-class outcome, not an error.
+- **`needs_clarification`** → `{ status, question, detail }` — the question was ambiguous.
+
+The **`visualization`** is itself discriminated on `kind`:
+
+- **`chart`** (`bar_chart`, `time_series`, `grouped_bar`, `choropleth`) —
+  `{ kind, type, title, encoding: {x, y, series?}, data: [DataPoint] }`, where
+  `DataPoint = { key, label, value, series?, citations: [Citation] }`.
+- **`network`** (`network_graph`) —
+  `{ kind, type, title, encoding: NetworkEncoding, nodes: [Node], edges: [Edge] }`, where
+  `Node = { id, label, kind, value }` and `Edge = { source, target, weight, citations }`.
+
+**`Citation` = `{ nct_id, excerpt, field }`** — `excerpt` is the exact value from `field` that placed
+the record in that bucket, and is a verified substring of the source record.
+
+**`meta`** carries `source`, `total_trials_matched`, `trials_aggregated`, `trials_unclassified`,
+`filters_applied`, `query_interpretation`, `units`, `sort`, `assumptions`, `advisories`,
+`resolved_entities`, and `truncated`. `trials_unclassified` + `assumptions` reconcile the bars
+against the trial total; `advisories` flag a technically-correct-but-uninformative chart;
+`resolved_entities` reports any canonicalized drug names ([see below](#-drug-entity-resolution)).
+
+Seven full request → response runs live in **[`examples/`](examples/)**; the six deterministic ones
+(including `07`, a too-broad distribution answered via the facet fast path) regenerate with
+`just examples`. The comparison run (`06`) needs an LLM key, since only the LLM planner splits a
+comparison into series.
+
+## ✨ Query & visualization coverage
+
+| Question class | Intent         | Visualization   | Example                                       |
+|----------------|----------------|-----------------|-----------------------------------------------|
+| Distribution   | `distribution` | `bar_chart`     | "trials by phase / status / sponsor type"     |
+| Time trend     | `time_trend`   | `time_series`   | "trials per year since 2015"                  |
+| Comparison     | `comparison`   | `grouped_bar`   | "compare phases for Drug A vs Drug B"          |
+| Geographic     | `geographic`   | `choropleth`    | "which countries have the most trials"        |
+| Relationship   | `network`      | `network_graph` | "network of sponsors ↔ drugs; drug ↔ drug"     |
+
+All five run through one engine — adding a class is a new IR variant + one aggregation + one viz
+mapping, with no changes to existing code. The no-key rule planner covers everything except
+comparison, which needs the LLM planner to split the arms.
+
+## 🧠 Design notes
+
+Why the load-bearing pieces are shaped the way they are.
+
+**Intent-discriminated IR** (`planner/ir.py`). The plan is a Pydantic discriminated union —
 `distribution | time_trend | comparison | geographic | network` — over a shared `Filters` block.
 Modeling it this way makes illegal states unrepresentable: a `NetworkPlan` *must* carry an entity
 pair, a `DistributionPlan` *must* carry a categorical dimension, and neither can hold the other's
-fields (`extra="forbid"`). *Alternatives rejected:* a flat plan with all-optional fields (illegal
-states become representable, policed by validators) and a fully generic query grammar (elegant, but
-a looser target for the LLM and weaker anti-hallucination). *Cost:* more schema surface. *Why it's
-right here:* the narrowest possible target for the model, and adding a query class is purely
-additive — new variant + one executor branch + one viz mapping, no changes to existing code. That is
-the "cover many query types with one coherent approach, no one-off hacks" the brief asks for.
+fields (`extra="forbid"`). It's the narrowest possible target for the model, and it's the
+anti-hallucination boundary expressed in the type system. (Rejected: a flat plan with all-optional
+fields, which makes illegal states representable and pushes the policing into hand-written
+validators.)
 
-### Controlled vocabulary sourced from the API itself
+**Controlled vocabulary sourced from the API itself** (`vocab/`). The enum values the planner may
+use for `phase`, `status`, `study_type`, `sponsor_class`, and `intervention_type` are pulled from the
+API's own `/stats/field/values` endpoint, snapshotted into `snapshot.json`, and enforced by a drift
+test. The model can only choose filter values the system certifies exist. Refresh the snapshot with
+`python -m ctgov_agent.tools.refresh_vocab`.
 
-`vocab/`. The enum values the planner may use for `phase`, `status`, `study_type`, `sponsor_class`,
-`intervention_type` are pulled from the API's own `/stats/field/values` endpoint, snapshotted, and
-enforced by a drift test. The model can only choose filter values the system certifies exist.
-*Cost:* the snapshot can drift from the live API. *Production path:* refresh it in CI on a schedule
-and fail the build on drift (the test already exists; only the cron is missing).
+**Client-side aggregation, by necessity.** The API's `/stats/field/values` facets return real
+server-side counts but are **global-only** — they reject a query filter with `400`. So any *filtered*
+count must be computed from real records: the engine pages every matching study (`pageSize=1000` +
+`pageToken`) with a compact field projection and counts in code. A `count()` pre-flight, a too-broad
+refusal, and an optional on-disk response cache (which also makes the example runs reproducible) keep
+that bounded.
 
-### Filtered aggregation is client-side — by necessity
+**Facet fast path for too-broad distributions** (`engine/pipeline.py`). A distribution is always over
+a small controlled-vocab enum (≤14 values), and while the API can't facet a *filtered* query, it
+*can* count one exactly. So when a distribution matches more trials than the too-broad threshold,
+instead of refusing we issue one server-side `count()` per enum value (plus one "any value" count for
+the exact unclassified figure) — no paging. The result is an **exact** chart with sample-backed
+citations: "breast cancer trials by phase" (16k+ trials) becomes a real answer in a handful of tiny
+requests instead of a flat refusal (see [`examples/07`](examples/07-distribution-too-broad.json)).
+Time trends, geography, and networks still need the actual records, so they refuse when too broad —
+the fast path applies exactly where the dimension is a closed vocabulary.
 
-I probed the API before designing: `/stats/field/values` returns real server-side facet counts but
-is **global-only** — it rejects a query filter with `400`. So counts for any *filtered* question must
-be computed from real records. The engine pages every matching study (`pageSize=1000` + `pageToken`)
-with a compact field projection and counts in code. *Cost:* a broad query means many pages.
-*Mitigations shipped:* a `count()` pre-flight, a too-broad refusal (below), and an on-disk response
-cache. *Production path:* periodically ingest ClinicalTrials.gov into a columnar store and aggregate
-there — turning O(pages) per query into a single indexed scan.
+**Two-tool planner with validate-and-retry** (`planner/llm.py`). The model gets exactly two tools —
+`emit_query_plan` (parameters = the QueryPlan JSON Schema) and `cannot_answer` — and is told to call
+one. Its raw arguments always run through Pydantic `parse_plan`; on failure the validation error is
+fed back for a single retry; if it still fails, the request is refused.
 
-### Facet fast path for too-broad distributions
+**Provider strategy with a no-key floor** (`planner/factory.py`, `planner/rules.py`). OpenRouter is
+preferred, the OpenAI key is an automatic fallback (both through one OpenAI-compatible client), and
+when *no* key is present a deterministic rule-based planner keeps the service running from the
+structured request fields. The fallback does no free-text entity extraction and can't split
+comparisons, so it refuses those rather than guessing.
 
-`engine/pipeline.py` (`_run_distribution_by_facets`). A *distribution* is always over a small
-controlled-vocab enum (≤14 values), and while the API can't facet a filtered query, it *can* count
-one exactly. So when a distribution matches more trials than the too-broad threshold, instead of
-refusing we issue **one server-side `count()` per enum value** (plus one "any value" count for the
-exact unclassified figure) — no paging. The result is an **exact** chart with sample-backed
-citations: *"breast cancer trials by phase"* (16k+ trials) went from a flat refusal to a real answer
-in ~8 tiny requests (see [`examples/07`](examples/07-distribution-too-broad.json)). *Cost:* the
-citations are a per-value sample rather than the full contributor set (disclosed in `meta`). *Why
-only distributions:* time trends, geography, and networks need the actual records, so they still
-refuse when too broad — the fast path applies exactly where the dimension is a closed vocabulary.
+**Uniform data points** (`api/schemas.py`). Every chart datum is `{key, label, value, series?,
+citations}` regardless of dimension, with `encoding` carrying the human axis labels. A frontend
+implements one renderer, not one per query type. (Rejected: semantic per-query field names like
+`{"phase": ..., "trial_count": ...}` — self-describing, but the renderer must then discover field
+names dynamically.)
 
-### Two-tool planner with validate-and-retry
+**Deep citations as exact, verifiable values** (`engine/citations.py`). Each datum and edge carries
+contributing `nct_id`s and an `excerpt` that is the *exact* field value that placed the record in
+that bucket — which makes it a provable substring of the source record. A property test enforces the
+invariant that every excerpt occurs in its source record. The excerpts are terse (`"PHASE3"`, a
+country name, a trial title for edges) precisely because an unverifiable prose snippet is the
+hallucination surface this design exists to remove.
 
-`planner/llm.py`. The model is given exactly two tools — `emit_query_plan` (parameters = the
-QueryPlan JSON Schema) and `cannot_answer` — and told to call one. Its raw arguments always run
-through Pydantic `parse_plan`; on failure the validation error is fed back for one retry; if it still
-fails, we refuse. *Cost:* up to one extra model call. *Production path:* self-consistency (sample N
-plans, take the majority) to cut the residual mis-plan rate; per-model structured-output tuning on
-OpenRouter.
+**Count reconciliation is explicit, never silent** (`engine/aggregate.py`). Real records break count
+conservation two ways: a trial with no value for the grouped dimension (an observational trial has no
+phase) lands in *no* bucket, and a multi-value trial (several phases) lands in *several*. So the bars
+need not sum to the trial total. Rather than hide that, every `ok` response reports
+`meta.trials_unclassified` and a human-readable `meta.assumptions` note ("632 of 3,736 trials report
+no phase and are excluded from the breakdown"). A property test ties the numbers to a conservation
+law. The alternative — bars that quietly don't add up — is exactly the silent wrongness this design
+is built to prevent.
 
-### Provider strategy + a no-key fallback
+**Low-signal advisories** (`engine/advisories.py`). A count can be perfectly correct and the chart
+still useless — a single bar, one value holding 95% of the total, a comparison arm with two trials in
+it. Deterministic checks emit a `meta.advisories` note in those cases (kept separate from
+`assumptions`, which is about how the counts add up). It never refuses or alters data; it just tells
+the reader when not to over-read the picture.
 
-`planner/factory.py`, `planner/rules.py`. OpenRouter is preferred, the OpenAI key is an automatic
-fallback (both via one OpenAI-compatible client), and when *no* key is present a deterministic
-rule-based planner keeps the service running from the structured request fields. *Cost:* the fallback
-does no free-text entity extraction and can't split comparisons — it refuses those. *Why:*
-clone-and-run with zero secrets, which is how the example runs and much of the test suite stay
-reproducible. *Production path:* a small local model for the offline path.
+## 💊 Drug entity resolution
 
-### Uniform data points
+`vocab/entities.py` ships a thin, API-verified brand/code → generic map for common oncology drugs. It
+exists because of a subtlety worth naming precisely: CT.gov's `query.intr` search already normalizes
+most synonyms — *Pembrolizumab*, *Keytruda*, and *MK-3475* all return the same 2,909 trials — but the
+normalization is **imperfect** for some drugs (*Herceptin* returns 1,733 trials, *Trastuzumab* 1,702;
+`Trastuzumab OR Herceptin` recovers the full 1,733). And the system otherwise has no *awareness* of
+entity identity — it can't tell you what canonical drug you searched, or notice that
+"Keytruda vs Pembrolizumab" compares a drug with itself.
 
-`api/schemas.py`. Every chart datum is `{key, label, value, series?, citations}` regardless of
-dimension, with `encoding` carrying the human axis labels. *Alternative rejected:* semantic per-query
-field names (`{"phase": …, "trial_count": …}`) — self-describing, but forces the renderer to discover
-field names dynamically. *Cost:* one layer of indirection through `encoding`. *Why:* a frontend
-implements one renderer, not one per query type.
+So the layer earns its place three ways: it (1) OR-expands a recognized drug to the union of its
+names — a small real recall win for the imperfectly-indexed ones, a no-op for the rest — (2) surfaces
+the resolution in `meta.resolved_entities` so the user sees what was searched, and (3) flags a
+same-drug comparison. Every mapping is verified against the live API. It's a curated slice, not a
+real ontology — the seam (`resolve_drug`, at the query-building boundary) is exactly where an
+RxNorm / ChEMBL lookup would drop in.
 
-### Deep citations as exact, verifiable values
-
-`engine/citations.py`. Each datum/edge carries contributing `nct_id`s and an `excerpt` that is the
-*exact* field value that placed the record in that bucket — which makes it a provable substring of
-the source record. A property test enforces *every excerpt occurs in its source record*. *Cost:*
-excerpts are terse (`"PHASE3"`, a country name, a trial title for edges) rather than free prose.
-*Why:* an unverifiable prose snippet is exactly the hallucination surface we're eliminating.
-*Production path:* character-span provenance into specific API fields, and a richer NL excerpt that is
-still span-checked.
-
-### Count reconciliation is explicit, never silent
-
-`engine/aggregate.py` (`reconcile`). Real trial records break count conservation two ways: a trial
-with no value for the grouped dimension (an observational trial has no phase) lands in **no** bucket,
-and a multi-value trial (several phases) lands in **several**. So the bars need not sum to the trial
-total. Rather than hide this, every `ok` response reports `meta.trials_unclassified` (how many trials
-fell out) and a human-readable `meta.assumptions` note ("312 of 3,736 trials report no phase and are
-excluded from the breakdown"; "a trial can report more than one phase…"). A property test ties the
-number to a conservation law. *Cost:* two extra meta fields. *Why:* the alternative — bars that
-quietly don't add up — is the kind of silent wrongness this whole design exists to prevent.
-
-### Low-signal advisories: flag a chart that answers nothing
-
-`engine/advisories.py`. A count can be perfectly correct and the chart still useless — a single bar,
-one value holding 95% of the total, a comparison arm with two trials in it. Deterministic checks emit
-a `meta.advisories` note in exactly those cases (kept separate from `assumptions`, which is about how
-the counts add up). *Cost:* a few heuristics with fixed thresholds. *Why:* it's the cheap, offline
-half of the chart-fitness judge `docs/EVAL.md` describes — it never refuses or alters data, it just
-tells the reader when not to over-read the picture.
-
-### Refusal is a first-class, typed outcome
-
-The response is a discriminated union on `status`; `refused` (out-of-domain, too-broad, no-data,
-upstream-error) and `needs_clarification` (ambiguous) are real states, not errors. The too-broad
-guard refuses rather than silently sampling a set too large to count exactly. *Cost:* some
-legitimately broad questions get bounced back for narrowing. *Why:* it's the brief's "cannot be
-processed rather than wrong" made mechanical, and it's tested.
-
-### No database
-
-The data source is the external API plus a response cache; there's no ORM or Postgres. *Cost:*
-latency and rate-limit exposure on broad queries. *Why:* a DB would be scope-inflation for a
-read-through visualization service. *Production path:* the ingestion store above (which also removes
-the too-broad limitation).
-
-## Entity resolution: a corrected assumption
-
-I originally called this the "biggest scope cut," assuming *Pembrolizumab*, *Keytruda*, and *MK-3475*
-were three different queries. **Probing the live API disproved that:** CT.gov's `query.intr` already
-normalizes drug synonyms, so those three all return the same 2,909 trials. The real gap was narrower
-and worth naming precisely:
-
-- **Recall is *mostly* handled by CT.gov — but imperfectly.** *Herceptin* returns 1,733 trials,
-  *Trastuzumab* 1,702; `Trastuzumab OR Herceptin` recovers the full 1,733.
-- **The system had no *awareness* of entity identity** — it couldn't tell a user what canonical drug
-  they searched, or notice that "Keytruda vs Pembrolizumab" compares a drug with itself.
-
-`vocab/entities.py` ships a thin, **API-verified** brand/code→generic map for common oncology drugs.
-It (1) OR-expands a recognized drug to the union of its names (a small recall win for the
-imperfectly-indexed ones, a no-op for the rest), (2) surfaces the resolution in
-`meta.resolved_entities`, and (3) flags a same-drug comparison. *Cost:* a curated map, not a real
-ontology. *Production path:* RxNorm / ChEMBL for the full pharmacopoeia and MeSH for conditions —
-this slice is the on-ramp, and the seam (`resolve_drug` at the query-building boundary) is already
-where that lookup would live.
-
-## Testing
+## 🧪 Testing
 
 ```sh
-just verify    # ruff (format+lint) + pyright --strict + pytest  (no network)
-just e2e       # live smoke against ClinicalTrials.gov + the real LLM (needs key); skips if absent
+just verify    # ruff (format + lint) + pyright --strict + pytest   (no network)
+just e2e       # live smoke against ClinicalTrials.gov + the real LLM (needs a key; skips if absent)
 ```
 
-Confidence comes from layered tests behind one gate (`just verify` = ruff + strict pyright +
-pytest), not a coverage number:
+Confidence comes from layered tests behind one gate, not a coverage number:
 
-- **Property (Hypothesis):** the citation invariant (*every excerpt ⊂ its source record*) and record
+- **Property (Hypothesis)** — the citation invariant (*every excerpt ⊂ its source record*) and record
   parser totality (*never raises on any input shape*).
-- **Unit:** the pure engine — executor param-building (strings verified against the live API),
-  aggregation counting (multi-value membership, per-study dedupe), network edge weights, IR
+- **Unit** — the pure engine: executor param-building (strings verified against the live API),
+  aggregation counting (multi-value membership, per-study dedupe), network edge weights, and IR
   validation (every rejection case).
-- **Integration (`TestClient` + DI'd fake planner + mocked API):** each intent end-to-end to an exact
-  visualization spec, and every refusal path.
-- **Negative:** out-of-domain → refused, too-broad → refused *without paging*, malformed LLM output →
-  retried then refused, upstream 500 → refused.
-- **Live smoke (`just e2e`, network-gated):** proves the CT.gov field mappings and the real LLM
+- **Integration** (`TestClient` + injected fake planner + mocked API) — each intent end-to-end to an
+  exact visualization spec, and every refusal path.
+- **Negative** — out-of-domain → refused, too-broad → refused *without paging*, malformed LLM output
+  → retried then refused, upstream 500 → refused.
+- **Live smoke** (`just e2e`, network-gated) — proves the CT.gov field mappings and the real
   tool-calling path still hold; skipped cleanly when no key is set.
 
-Beyond the suite, an offline **planner stress-test** (a gold-labeled question corpus scored against
-the real planner) measures mis-plan and refuse-vs-force-fit rates — see [`docs/EVAL.md`](docs/EVAL.md)
-and [`tools/eval/`](tools/eval).
+Beyond the suite, an offline planner eval harness scores the LLM planner against a gold-labeled
+question corpus — measuring how often it mis-plans and whether it *refuses* questions it can't answer
+rather than force-fitting them. See [`docs/EVAL.md`](docs/EVAL.md) and [`tools/eval/`](tools/eval).
 
-## What I'd do next
+## 🗺️ Roadmap
 
-In priority order:
+- [ ] **Ontology-backed entity resolution** — RxNorm / ChEMBL for the full pharmacopoeia and MeSH for
+      conditions, replacing the curated oncology map.
+- [ ] **Ingestion store for aggregation** — periodically ingest CT.gov into a columnar store and
+      aggregate there, turning O(pages)-per-query into a single indexed scan and lifting the
+      remaining too-broad limit (time trends, geography, networks).
+- [ ] **Self-consistency planning** — sample N plans and take the majority, to drive the residual
+      mis-plan rate down.
+- [ ] **Richer, still-verified citations** — character-span provenance and a natural-language excerpt
+      that is still span-checked against the source.
+- [ ] **More intents** — funnel / sankey for enrollment, survival-style timelines; each additive.
+- [ ] **A first-party renderer** — ship the Vega-Lite adapter and a real frontend so the specs are
+      seen, not just described.
 
-1. **Entity resolution** via a real ontology — RxNorm / ChEMBL for the whole pharmacopoeia and MeSH
-   for conditions, replacing the thin curated drug map that already ships (see above).
-2. **Ingestion store** for aggregation — removes the *remaining* too-broad limit (time trends,
-   geography, networks) and the paging cost. Distributions already sidestep it via the facet fast
-   path.
-3. **Self-consistency planning** — sample multiple plans and vote, to drive the mis-plan rate down.
-4. **Richer, still-verified citations** — character spans and NL excerpts checked against source.
-5. **More intents** — funnel/sankey for enrollment, survival-style timelines — each additive.
-6. **A thin renderer** — ship the Vega-Lite adapter + a real frontend so the specs are seen, not
-   just described.
+## 📁 Project structure
 
-## AI tool usage (integrity note)
-
-An honest account, per the assignment's §8: the tools used, how correctness was validated, and what
-was designed deliberately versus generated and adapted.
-
-**Human engineering, AI-accelerated.** The architecture and every load-bearing decision — the "LLM
-plans / code computes" thesis, the intent-discriminated IR, client-side aggregation (chosen after
-probing the live API), the citation-verification invariant, the refusal taxonomy — were designed
-deliberately, up front. Claude Code (Anthropic) then implemented that design in **thin vertical
-slices** (scaffold → IR → client → one intent → planner → network → citations → guardrails →
-examples → docs), each gated by `just verify` (ruff + strict pyright + pytest) and human-reviewed
-before it was committed. The runtime planner separately calls the OpenRouter/OpenAI APIs — distinct
-from the tooling used to write the code.
-
-The valuable part of a system like this is judgment — knowing exactly where the design holds and
-where it stops, and probing the API instead of trusting a plausible guess. That judgment, and the
-responsibility for it, is human; the model was a fast, well-directed pair of hands held to a green
-gate. The table is explicit about the split.
-
-| Area                                    | Designed & owned by       | Implemented | Verified by                              |
-|-----------------------------------------|---------------------------|-------------|------------------------------------------|
-| "LLM plans, code computes" thesis       | Human                     | AI             | Whole architecture; citation invariant   |
-| Intent-discriminated IR shape           | Human (chosen over 2 alt) | AI             | `test_ir.py` (all rejection cases)       |
-| Client-side aggregation strategy        | Human (from API probing)  | AI             | Live API probes + `test_ctgov_client.py` |
-| CT.gov query/filter syntax              | Verified vs live API      | AI             | Probes, then `test_executor.py`, e2e     |
-| Vocabulary-from-API guardrail           | Human                     | AI             | `test_vocab.py` drift guard              |
-| Deep-citation verification invariant    | Human                     | AI             | `test_citations_invariant.py` (property) |
-| Refusal taxonomy (`ok/refused/clarify`) | Human                     | AI             | `test_guardrails.py`                     |
-| Prompt + tool definitions               | Human intent, AI drafted  | AI             | `test_llm_planner.py` (DI fake model)    |
-| Test suite                              | Human (test philosophy)   | AI             | It is the verification                   |
-
-**Guardrails against trusting model memory.** API facts were **never taken from the model's memory**.
-Before writing each layer I probed the live ClinicalTrials.gov v2 API and used the actual responses:
-
-- Confirmed `/stats/field/values` is global-only (rejects query filters) — this decided the whole
-  aggregation strategy.
-- Captured the exact controlled vocabulary (phases, statuses, sponsor classes, …) into a committed
-  snapshot with a drift test.
-- Verified the Essie `filter.advanced` syntax (`AREA[Field](A OR B)`, `RANGE[lo,hi]`) and the
-  projection field names against real 200 responses, then pinned them with tests.
-
-**Adversarial review.** Findings and code were checked from independent angles rather than a single
-read: correctness (does the count conserve? does the parser stay total?), anti-hallucination (can any
-excerpt fail to appear in its source?), and real-world-data handling (missing fields, multi-value
-fields, empty results, too-broad sets). Each concern is encoded as a test so it stays checked, not
-checked once.
-
-## Project structure
-
-```
+```text
 src/ctgov_agent/
-├── api/         # FastAPI app (thin) + request/response schemas
+├── api/         # FastAPI app (thin) + the request/response contract
 ├── planner/     # QueryPlan IR, LLM planner (+ validate/retry), rule fallback, prompt
-├── vocab/       # controlled vocabulary sourced from /stats/field/values (+ snapshot)
+├── vocab/       # controlled vocabulary from /stats/field/values (+ snapshot) + drug entities
 ├── ctgov/       # v2 API client (paging, projection, cache) + defensive record parser
-└── engine/      # executor · aggregate · network · vizselect · citations · pipeline
+├── engine/      # executor · aggregate · network · vizselect · citations · advisories · pipeline
+└── web/         # self-contained demo page (a pure consumer of the contract)
 tests/           # unit · integration · property · e2e   (single gate: just verify)
-examples/        # 3–5 golden request→response runs
+examples/        # golden request → response runs
+docs/EVAL.md     # offline planner evaluation (harness in tools/eval/)
 ```
 
-## License
+## 📄 License
 
 MIT — see [`LICENSE`](LICENSE).
