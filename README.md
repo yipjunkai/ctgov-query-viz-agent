@@ -23,7 +23,7 @@ stops working and what you'd do next.
 5. [Response schema](#response-schema)
 6. [Query & visualization coverage](#query--visualization-coverage)
 7. [Design decisions, costs, and production paths](#design-decisions-costs-and-production-paths)
-8. [The biggest scope cut: entity resolution](#the-biggest-scope-cut-entity-resolution)
+8. [Entity resolution: a corrected assumption](#entity-resolution-a-corrected-assumption)
 9. [Testing](#testing)
 10. [What I'd do next](#what-id-do-next)
 11. [AI tool usage (integrity note)](#ai-tool-usage-integrity-note)
@@ -134,9 +134,11 @@ The **`visualization`** is itself discriminated on `kind`:
 supports the datum, and is a verified substring of the source record.
 
 **`meta`** = `{ source, total_trials_matched, trials_aggregated, trials_unclassified,
-filters_applied, query_interpretation, units, sort, assumptions, advisories, truncated }`.
+filters_applied, query_interpretation, units, sort, assumptions, advisories, resolved_entities,
+truncated }`.
 `trials_unclassified` and `assumptions` reconcile the bars against the trial total; `advisories`
-flag a degenerate-but-valid chart (see below).
+flag a degenerate-but-valid chart; `resolved_entities` reports any canonicalized drug names (all
+below).
 
 Example `ok` response (trimmed):
 
@@ -297,13 +299,25 @@ latency and rate-limit exposure on broad queries. *Why:* a DB would be scope-inf
 read-through visualization service. *Production path:* the ingestion store above (which also removes
 the too-broad limitation).
 
-## The biggest scope cut: entity resolution
+## Entity resolution: a corrected assumption
 
-Drug and condition names are passed to ClinicalTrials.gov's search as-is. There is **no synonym /
-ontology layer**, so *Pembrolizumab*, *Keytruda*, and *MK-3475* are three different queries. This is
-the limitation most likely to surprise a user. *Production path:* normalize entities through RxNorm /
-MeSH / ChEMBL before building filters, and expose the resolved entity in `meta` so the user sees what
-was actually queried.
+I originally called this the "biggest scope cut," assuming *Pembrolizumab*, *Keytruda*, and *MK-3475*
+were three different queries. **Probing the live API disproved that:** CT.gov's `query.intr` already
+normalizes drug synonyms, so those three all return the same 2,909 trials. The real gap was narrower
+and worth naming precisely:
+
+- **Recall is *mostly* handled by CT.gov — but imperfectly.** *Herceptin* returns 1,733 trials,
+  *Trastuzumab* 1,702; `Trastuzumab OR Herceptin` recovers the full 1,733.
+- **The system had no *awareness* of entity identity** — it couldn't tell a user what canonical drug
+  they searched, or notice that "Keytruda vs Pembrolizumab" compares a drug with itself.
+
+`vocab/entities.py` ships a thin, **API-verified** brand/code→generic map for common oncology drugs.
+It (1) OR-expands a recognized drug to the union of its names (a small recall win for the
+imperfectly-indexed ones, a no-op for the rest), (2) surfaces the resolution in
+`meta.resolved_entities`, and (3) flags a same-drug comparison. *Cost:* a curated map, not a real
+ontology. *Production path:* RxNorm / ChEMBL for the full pharmacopoeia and MeSH for conditions —
+this slice is the on-ramp, and the seam (`resolve_drug` at the query-building boundary) is already
+where that lookup would live.
 
 ## Testing
 
@@ -335,7 +349,8 @@ and [`tools/eval/`](tools/eval).
 
 In priority order:
 
-1. **Entity resolution** via a medical ontology — the highest-leverage correctness win.
+1. **Entity resolution** via a real ontology — RxNorm / ChEMBL for the whole pharmacopoeia and MeSH
+   for conditions, replacing the thin curated drug map that already ships (see above).
 2. **Ingestion store** for aggregation — removes the *remaining* too-broad limit (time trends,
    geography, networks) and the paging cost. Distributions already sidestep it via the facet fast
    path.

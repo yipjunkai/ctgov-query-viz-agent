@@ -270,3 +270,34 @@ def test_dominant_distribution_carries_a_low_signal_advisory() -> None:
     body = resp.json()
     assert body["status"] == "ok"
     assert any("concentrated" in note for note in body["meta"]["advisories"])
+
+
+def test_meta_resolves_a_known_drug_name() -> None:
+    plan = DistributionPlan(
+        intent="distribution",
+        dimension=CategoricalDim.phase,
+        filters=Filters(intervention="Keytruda"),
+    )
+    studies = [
+        {
+            "protocolSection": {
+                "identificationModule": {"nctId": "NCT1"},
+                "designModule": {"phases": ["PHASE2"]},
+            }
+        }
+    ]
+    ctgov = CtgovClient()
+    app.dependency_overrides[get_pipeline] = lambda: Pipeline(FakePlanner(plan), ctgov)
+    try:
+        with respx.mock:
+            respx.get("https://clinicaltrials.gov/api/v2/studies").mock(
+                return_value=httpx.Response(200, json={"totalCount": 1, "studies": studies})
+            )
+            resp = TestClient(app).post("/visualize", json={"query": "keytruda by phase"})
+    finally:
+        app.dependency_overrides.clear()
+
+    entities = resp.json()["meta"]["resolved_entities"]
+    assert len(entities) == 1
+    assert entities[0]["input"] == "Keytruda"
+    assert entities[0]["canonical"] == "Pembrolizumab"

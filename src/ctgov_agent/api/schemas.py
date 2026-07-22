@@ -101,6 +101,14 @@ class NetworkVisualization(BaseModel):
 Visualization = Annotated[ChartVisualization | NetworkVisualization, Field(discriminator="kind")]
 
 
+class ResolvedEntity(BaseModel):
+    """A drug name the system recognized and canonicalized (e.g. Keytruda → Pembrolizumab)."""
+
+    input: str
+    canonical: str
+    synonyms: list[str] = []
+
+
 class Meta(BaseModel):
     source: str = "clinicaltrials.gov"
     total_trials_matched: int
@@ -116,6 +124,9 @@ class Meta(BaseModel):
     # Deterministic "this chart may be uninformative" flags (single bar, one value dominating, a
     # near-empty comparison series). Distinct from ``assumptions``, which explain how counts add up.
     advisories: list[str] = []
+    # Drug names the system recognized and canonicalized (e.g. the query said "Keytruda"; it was
+    # searched as Pembrolizumab). Empty when no filter named a known drug.
+    resolved_entities: list[ResolvedEntity] = []
     truncated: bool = False
 
 
