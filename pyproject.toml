@@ -53,6 +53,8 @@ root = "tests"
 reportUnknownMemberType = false
 reportUnknownVariableType = false
 reportUnknownArgumentType = false
+# White-box tests legitimately exercise module-internal helpers.
+reportPrivateUsage = false
 
 [tool.pytest.ini_options]
 # e2e (live-network) tests are deselected from the default gate; run them via `just e2e`.

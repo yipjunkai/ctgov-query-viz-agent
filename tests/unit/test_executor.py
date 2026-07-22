@@ -1,8 +1,8 @@
 """Filters → CT.gov query params. The exact strings here were verified against the live API."""
 
-from ctgov_agent.engine.executor import build_query_params
+from ctgov_agent.engine.executor import build_query_params, combine_filters
 from ctgov_agent.planner.ir import Filters
-from ctgov_agent.vocab.controlled import Phase, SponsorClass, Status
+from ctgov_agent.vocab.controlled import InterventionType, Phase, SponsorClass, Status, StudyType
 
 
 def test_entity_and_location_filters() -> None:
@@ -56,3 +56,24 @@ def test_open_ended_date_range_uses_min_max_sentinels() -> None:
 
 def test_empty_filters_produce_no_params() -> None:
     assert build_query_params(Filters()) == {}
+
+
+def test_study_type_and_intervention_type_clauses() -> None:
+    params = build_query_params(
+        Filters(
+            study_type=[StudyType.INTERVENTIONAL],
+            intervention_type=[InterventionType.DRUG, InterventionType.BIOLOGICAL],
+        )
+    )
+    assert params["filter.advanced"] == (
+        "AREA[StudyType]INTERVENTIONAL AND "
+        "(AREA[InterventionType]DRUG OR AREA[InterventionType]BIOLOGICAL)"
+    )
+
+
+def test_combine_filters_overlays_series_onto_base() -> None:
+    combined = combine_filters(
+        Filters(condition="melanoma", intervention="baseDrug"), Filters(intervention="Nivolumab")
+    )
+    assert combined.condition == "melanoma"  # shared base kept
+    assert combined.intervention == "Nivolumab"  # series value wins

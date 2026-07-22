@@ -68,3 +68,13 @@ def test_max_edges_cap_keeps_heaviest() -> None:
     records = [_rec(f"N{i}", sponsor=f"S{i}", interventions=(f"D{i}",)) for i in range(5)]
     _nodes, edges = build_network(records, (EntityDim.sponsor, EntityDim.intervention), max_edges=2)
     assert len(edges) == 2
+
+
+def test_condition_intervention_network() -> None:
+    records = [
+        _rec("N1", conditions=("Melanoma",), interventions=("Pembrolizumab",)),
+        _rec("N2", conditions=("Melanoma",), interventions=("Pembrolizumab",)),
+    ]
+    _nodes, edges = build_network(records, (EntityDim.condition, EntityDim.intervention))
+    weights = {(e.source, e.target): e.weight for e in edges}
+    assert weights[("condition:Melanoma", "intervention:Pembrolizumab")] == 2
