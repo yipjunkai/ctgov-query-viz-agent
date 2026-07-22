@@ -17,8 +17,14 @@ class Settings(BaseSettings):
     openai_api_key: str | None = None
 
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
-    openrouter_model: str = "openai/gpt-4o-mini"
-    openai_model: str = "gpt-4o-mini"
+    # Planning is light structured extraction, so a *mini* is the sweet spot (cost/latency). Any
+    # model on the key's allowlist works — override via OPENROUTER_MODEL / OPENAI_MODEL.
+    openrouter_model: str = "openai/gpt-5-mini"
+    openai_model: str = "gpt-5-mini"
+
+    # Left unset (the model's default) for cross-model compatibility — some models reject a
+    # non-default temperature. Set PLANNER_TEMPERATURE=0 for deterministic planning where supported.
+    planner_temperature: float | None = None
 
     request_timeout: float = 30.0
     # Refuse (rather than aggregate) any query whose match set exceeds this — see the too-broad

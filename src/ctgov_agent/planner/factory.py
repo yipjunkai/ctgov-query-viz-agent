@@ -15,8 +15,14 @@ def build_planner(settings: Settings) -> Planner:
             base_url=settings.openrouter_base_url,
             timeout=settings.request_timeout,
         )
-        return LLMPlanner(OpenAIChatModel(client, settings.openrouter_model))
+        model = OpenAIChatModel(
+            client, settings.openrouter_model, temperature=settings.planner_temperature
+        )
+        return LLMPlanner(model)
     if settings.openai_api_key:
         client = AsyncOpenAI(api_key=settings.openai_api_key, timeout=settings.request_timeout)
-        return LLMPlanner(OpenAIChatModel(client, settings.openai_model))
+        model = OpenAIChatModel(
+            client, settings.openai_model, temperature=settings.planner_temperature
+        )
+        return LLMPlanner(model)
     return RuleBasedPlanner()

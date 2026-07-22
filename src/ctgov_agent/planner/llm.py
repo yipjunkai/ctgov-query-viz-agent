@@ -10,7 +10,7 @@ import json
 from dataclasses import dataclass
 from typing import Any, Protocol
 
-from openai import AsyncOpenAI
+from openai import AsyncOpenAI, omit
 from pydantic import ValidationError
 
 from ctgov_agent.planner.base import PlannerError
@@ -41,9 +41,12 @@ class ChatModel(Protocol):
 class OpenAIChatModel:
     """Thin adapter over any OpenAI-compatible endpoint (OpenRouter or OpenAI direct)."""
 
-    def __init__(self, client: AsyncOpenAI, model: str) -> None:
+    def __init__(
+        self, client: AsyncOpenAI, model: str, *, temperature: float | None = None
+    ) -> None:
         self._client = client
         self._model = model
+        self._temperature = temperature
 
     async def complete(
         self, messages: list[dict[str, Any]], tools: list[dict[str, Any]]
@@ -53,7 +56,7 @@ class OpenAIChatModel:
             messages=messages,  # pyright: ignore[reportArgumentType]  (SDK TypedDicts; runtime dicts are fine)
             tools=tools,  # pyright: ignore[reportArgumentType]
             tool_choice="required",
-            temperature=0,
+            temperature=self._temperature if self._temperature is not None else omit,
         )
         calls = resp.choices[0].message.tool_calls
         if not calls:
