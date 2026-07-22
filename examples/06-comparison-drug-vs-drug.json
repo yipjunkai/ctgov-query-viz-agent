@@ -305,6 +305,7 @@
       "source": "clinicaltrials.gov",
       "total_trials_matched": 4918,
       "trials_aggregated": 4918,
+      "trials_unclassified": 379,
       "filters_applied": {
         "base": {},
         "series": [
@@ -325,7 +326,10 @@
       "query_interpretation": "Compare distribution of trials that list Nivolumab vs Pembrolizumab as interventions across clinical trial phases (counts of trials per phase for each drug). Intervention matched by exact name string.",
       "units": "trials",
       "sort": "grouped by series",
-      "assumptions": [],
+      "assumptions": [
+        "379 of 4,918 trials report no phase and are excluded from the comparison.",
+        "A trial can report more than one phase; it is counted once per phase, so counts can exceed the trial total."
+      ],
       "truncated": false
     }
   }

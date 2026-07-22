@@ -21,9 +21,12 @@ from ctgov_agent.ctgov.client import DEFAULT_MAX_RECORDS, CtgovClient
 from ctgov_agent.ctgov.models import StudyRecord, parse_study
 from ctgov_agent.engine.aggregate import (
     Bucket,
+    Reconciliation,
     aggregate_by_country,
     aggregate_by_dimension,
     aggregate_by_year,
+    dimension_values,
+    reconcile,
 )
 from ctgov_agent.engine.executor import build_query_params, combine_filters
 from ctgov_agent.engine.network import build_network
@@ -86,15 +89,46 @@ def _merge_hints(plan: QueryPlan, req: VisualizeRequest) -> QueryPlan:
     return plan.model_copy(update={"filters": merged})
 
 
+def _year_values(record: StudyRecord) -> tuple[int, ...]:
+    return (record.start_year,) if record.start_year is not None else ()
+
+
+def _reconciliation_notes(
+    rec: Reconciliation, total: int, value_noun: str, breakdown: str
+) -> list[str]:
+    """Human-readable meta notes explaining any gap between the bars and the trial total."""
+    notes: list[str] = []
+    if rec.unclassified:
+        notes.append(
+            f"{rec.unclassified:,} of {total:,} trials report no {value_noun} and are excluded "
+            f"from the {breakdown}."
+        )
+    if rec.multivalue:
+        notes.append(
+            f"A trial can report more than one {value_noun}; it is counted once per {value_noun}, "
+            f"so counts can exceed the trial total."
+        )
+    return notes
+
+
 def _build_meta(
-    total: int, records: list[StudyRecord], filters: Filters, notes: str | None, sort: str
+    total: int,
+    records: list[StudyRecord],
+    filters: Filters,
+    notes: str | None,
+    sort: str,
+    *,
+    unclassified: int = 0,
+    assumptions: list[str] | None = None,
 ) -> Meta:
     return Meta(
         total_trials_matched=total,
         trials_aggregated=len(records),
+        trials_unclassified=unclassified,
         filters_applied=filters.model_dump(mode="json", exclude_none=True),
         query_interpretation=notes,
         sort=sort,
+        assumptions=assumptions or [],
         truncated=len(records) >= DEFAULT_MAX_RECORDS,
     )
 
@@ -204,8 +238,19 @@ class Pipeline:
                 return _no_data(_missing_dimension_message(plan.dimension, len(records)))
             return _no_data()
         viz, sort_desc = distribution_chart(plan, buckets)
+        rec = reconcile(records, buckets, lambda r: dimension_values(r, plan.dimension))
+        noun = plan.dimension.value.replace("_", " ")
         return OkResponse(
-            visualization=viz, meta=_build_meta(total, records, plan.filters, plan.notes, sort_desc)
+            visualization=viz,
+            meta=_build_meta(
+                total,
+                records,
+                plan.filters,
+                plan.notes,
+                sort_desc,
+                unclassified=rec.unclassified,
+                assumptions=_reconciliation_notes(rec, len(records), noun, "breakdown"),
+            ),
         )
 
     async def _run_time_trend(self, plan: TimeTrendPlan) -> AgentResponse:
@@ -214,8 +259,18 @@ class Pipeline:
         if not buckets:
             return _no_data("No trials with a known start date matched the query.")
         viz, sort_desc = time_series_chart(plan.filters, buckets)
+        rec = reconcile(records, buckets, _year_values)
         return OkResponse(
-            visualization=viz, meta=_build_meta(total, records, plan.filters, plan.notes, sort_desc)
+            visualization=viz,
+            meta=_build_meta(
+                total,
+                records,
+                plan.filters,
+                plan.notes,
+                sort_desc,
+                unclassified=rec.unclassified,
+                assumptions=_reconciliation_notes(rec, len(records), "start date", "trend"),
+            ),
         )
 
     async def _run_geographic(self, plan: GeographicPlan) -> AgentResponse:
@@ -224,26 +279,44 @@ class Pipeline:
         if not buckets:
             return _no_data("No trials with a known location matched the query.")
         viz, sort_desc = geographic_chart(plan.filters, buckets)
+        rec = reconcile(records, buckets, lambda r: r.countries)
         return OkResponse(
-            visualization=viz, meta=_build_meta(total, records, plan.filters, plan.notes, sort_desc)
+            visualization=viz,
+            meta=_build_meta(
+                total,
+                records,
+                plan.filters,
+                plan.notes,
+                sort_desc,
+                unclassified=rec.unclassified,
+                assumptions=_reconciliation_notes(rec, len(records), "country", "map"),
+            ),
         )
 
     async def _run_comparison(self, plan: ComparisonPlan) -> AgentResponse:
         series_results: list[tuple[str, list[Bucket]]] = []
         aggregated = 0
+        unclassified = 0
+        multivalue = False
         for series in plan.series:
             filters = combine_filters(plan.base_filters, series.filters)
             _total, records = await self._fetch(filters)
             aggregated += len(records)
-            series_results.append((series.label, aggregate_by_dimension(records, plan.dimension)))
+            buckets = aggregate_by_dimension(records, plan.dimension)
+            rec = reconcile(records, buckets, lambda r: dimension_values(r, plan.dimension))
+            unclassified += rec.unclassified
+            multivalue = multivalue or rec.multivalue
+            series_results.append((series.label, buckets))
         if all(not buckets for _label, buckets in series_results):
             if aggregated:
                 return _no_data(_missing_dimension_message(plan.dimension, aggregated))
             return _no_data()
         viz, sort_desc = comparison_chart(plan, series_results)
+        noun = plan.dimension.value.replace("_", " ")
         meta = Meta(
             total_trials_matched=aggregated,
             trials_aggregated=aggregated,
+            trials_unclassified=unclassified,
             filters_applied={
                 "base": plan.base_filters.model_dump(mode="json", exclude_none=True),
                 "series": [
@@ -256,6 +329,9 @@ class Pipeline:
             },
             query_interpretation=plan.notes,
             sort=sort_desc,
+            assumptions=_reconciliation_notes(
+                Reconciliation(unclassified, multivalue), aggregated, noun, "comparison"
+            ),
             truncated=False,
         )
         return OkResponse(visualization=viz, meta=meta)

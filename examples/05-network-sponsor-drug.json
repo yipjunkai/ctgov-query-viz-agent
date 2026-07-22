@@ -1665,6 +1665,7 @@
       "source": "clinicaltrials.gov",
       "total_trials_matched": 3736,
       "trials_aggregated": 3736,
+      "trials_unclassified": 0,
       "filters_applied": {
         "condition": "melanoma"
       },

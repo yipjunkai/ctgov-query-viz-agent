@@ -327,6 +327,7 @@
       "source": "clinicaltrials.gov",
       "total_trials_matched": 2841,
       "trials_aggregated": 2841,
+      "trials_unclassified": 0,
       "filters_applied": {
         "intervention": "Pembrolizumab",
         "start_year_min": 2015

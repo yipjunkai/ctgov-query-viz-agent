@@ -165,13 +165,17 @@
       "source": "clinicaltrials.gov",
       "total_trials_matched": 3736,
       "trials_aggregated": 3736,
+      "trials_unclassified": 632,
       "filters_applied": {
         "condition": "melanoma"
       },
       "query_interpretation": "Planned by the deterministic rule-based fallback (no LLM key configured).",
       "units": "trials",
       "sort": "canonical phase order",
-      "assumptions": [],
+      "assumptions": [
+        "632 of 3,736 trials report no phase and are excluded from the breakdown.",
+        "A trial can report more than one phase; it is counted once per phase, so counts can exceed the trial total."
+      ],
       "truncated": false
     }
   }
