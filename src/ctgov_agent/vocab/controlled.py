@@ -30,6 +30,13 @@ SNAPSHOT_FIELDS: tuple[str, ...] = (
     "InterventionType",
 )
 
+# Plausible clinical-trial start-year bounds. CT.gov launched in 2000; the lower slack absorbs
+# legitimately backdated records, the upper leaves room for planned/future trials. Kept here as the
+# single source of truth so both the request boundary (api/schemas.py) and the plan IR
+# (planner/ir.py) reject nonsense year filters against the same range.
+MIN_YEAR = 1990
+MAX_YEAR = 2100
+
 
 class Phase(StrEnum):
     NA = "NA"

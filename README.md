@@ -117,13 +117,13 @@ API and data path don't).
 Every response is a discriminated union on `status`:
 
 - **`ok`** → `{ status, visualization, meta }`
-- **`refused`** → `{ status, reason, message, detail }` — `reason` ∈ `out_of_domain, too_broad,
-  no_data, upstream_error, planner_unavailable, unsupported`.
+- **`refused`** → `{ status, reason, message, detail }` — `reason` ∈ `out_of_domain, unsupported,
+  too_broad, no_data, upstream_error, planner_failed`.
 - **`needs_clarification`** → `{ status, question, detail }` — the query was ambiguous.
 
 The **`visualization`** is itself discriminated on `kind`:
 
-- **`chart`** (`bar_chart`, `histogram`, `time_series`, `grouped_bar`, `choropleth`):
+- **`chart`** (`bar_chart`, `time_series`, `grouped_bar`, `choropleth`):
   `{ kind, type, title, encoding: {x, y, series?}, data: [DataPoint] }`
   where `DataPoint = { key, label, value, series?, citations: [Citation] }`.
 - **`network`** (`network_graph`):

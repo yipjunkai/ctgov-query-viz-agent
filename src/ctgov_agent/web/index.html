@@ -364,7 +364,7 @@ const EXAMPLES = [
   ["Sponsor ↔ drug network", {query:"Show a network of sponsors and drugs for melanoma trials", condition:"melanoma"}],
   ["Pembrolizumab by status", {query:"Break down pembrolizumab trials by recruitment status", drug_name:"Pembrolizumab"}],
 ];
-const VIZ_LABEL = { bar_chart:"Bar chart", histogram:"Histogram", time_series:"Time series", grouped_bar:"Grouped bars", choropleth:"By country", network_graph:"Network graph" };
+const VIZ_LABEL = { bar_chart:"Bar chart", time_series:"Time series", grouped_bar:"Grouped bars", choropleth:"By country", network_graph:"Network graph" };
 
 const $ = (id) => document.getElementById(id);
 function show(id, on) { $(id).classList.toggle("hidden", !on); }
@@ -444,7 +444,7 @@ function render(body) {
     const reasons = {
       too_broad: "Too broad to aggregate exactly", out_of_domain: "Outside the clinical-trials domain",
       no_data: "No matching trials", unsupported: "Not expressible as a supported query", upstream_error: "Upstream API error",
-      planner_unavailable: "Planner unavailable",
+      planner_failed: "The planner could not produce a valid plan",
     };
     const title = reasons[body.reason] || "Cannot process this query";
     banner("warn", title, escapeHtml(body.message), 'refusal reason: <span class="rc">' + body.reason + "</span>");
