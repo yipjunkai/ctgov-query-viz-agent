@@ -19,6 +19,11 @@ from ctgov_agent.api.schemas import (
 )
 from ctgov_agent.ctgov.client import DEFAULT_MAX_RECORDS, CtgovClient
 from ctgov_agent.ctgov.models import StudyRecord, parse_study
+from ctgov_agent.engine.advisories import (
+    comparison_advisories,
+    distribution_advisories,
+    time_trend_advisories,
+)
 from ctgov_agent.engine.aggregate import (
     Bucket,
     Reconciliation,
@@ -128,6 +133,7 @@ def _build_meta(
     *,
     unclassified: int = 0,
     assumptions: list[str] | None = None,
+    advisories: list[str] | None = None,
 ) -> Meta:
     return Meta(
         total_trials_matched=total,
@@ -137,6 +143,7 @@ def _build_meta(
         query_interpretation=notes,
         sort=sort,
         assumptions=assumptions or [],
+        advisories=advisories or [],
         truncated=len(records) >= DEFAULT_MAX_RECORDS,
     )
 
@@ -271,6 +278,7 @@ class Pipeline:
                 sort_desc,
                 unclassified=rec.unclassified,
                 assumptions=_reconciliation_notes(rec, len(records), noun, "breakdown"),
+                advisories=distribution_advisories(buckets, noun),
             ),
         )
 
@@ -321,6 +329,7 @@ class Pipeline:
             query_interpretation=plan.notes,
             sort=sort_desc,
             assumptions=assumptions,
+            advisories=distribution_advisories(buckets, noun),
             truncated=False,
         )
         return OkResponse(visualization=viz, meta=meta)
@@ -342,6 +351,7 @@ class Pipeline:
                 sort_desc,
                 unclassified=rec.unclassified,
                 assumptions=_reconciliation_notes(rec, len(records), "start date", "trend"),
+                advisories=time_trend_advisories(buckets),
             ),
         )
 
@@ -362,6 +372,7 @@ class Pipeline:
                 sort_desc,
                 unclassified=rec.unclassified,
                 assumptions=_reconciliation_notes(rec, len(records), "country", "map"),
+                advisories=distribution_advisories(buckets, "country"),
             ),
         )
 
@@ -404,6 +415,7 @@ class Pipeline:
             assumptions=_reconciliation_notes(
                 Reconciliation(unclassified, multivalue), aggregated, noun, "comparison"
             ),
+            advisories=comparison_advisories(series_results),
             truncated=False,
         )
         return OkResponse(visualization=viz, meta=meta)

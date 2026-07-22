@@ -113,6 +113,9 @@ class Meta(BaseModel):
     units: str = "trials"
     sort: str | None = None
     assumptions: list[str] = []
+    # Deterministic "this chart may be uninformative" flags (single bar, one value dominating, a
+    # near-empty comparison series). Distinct from ``assumptions``, which explain how counts add up.
+    advisories: list[str] = []
     truncated: bool = False
 
 

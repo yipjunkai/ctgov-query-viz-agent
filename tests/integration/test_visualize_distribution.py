@@ -240,3 +240,33 @@ def test_too_broad_distribution_uses_facet_fast_path() -> None:
     # Deep citations survive: the excerpt is the exact phase value from a sample record.
     p2 = next(p for p in body["visualization"]["data"] if p["key"] == "PHASE2")
     assert p2["citations"] and p2["citations"][0]["excerpt"] == "PHASE2"
+
+
+def test_dominant_distribution_carries_a_low_signal_advisory() -> None:
+    # 19 of 20 trials are PHASE2 (95%): a valid chart, but the advisory warns it's degenerate.
+    plan = DistributionPlan(
+        intent="distribution", dimension=CategoricalDim.phase, filters=Filters(condition="x")
+    )
+    studies = [
+        {
+            "protocolSection": {
+                "identificationModule": {"nctId": f"NCT{i}"},
+                "designModule": {"phases": ["PHASE2" if i < 19 else "PHASE3"]},
+            }
+        }
+        for i in range(20)
+    ]
+    ctgov = CtgovClient()
+    app.dependency_overrides[get_pipeline] = lambda: Pipeline(FakePlanner(plan), ctgov)
+    try:
+        with respx.mock:
+            respx.get("https://clinicaltrials.gov/api/v2/studies").mock(
+                return_value=httpx.Response(200, json={"totalCount": 20, "studies": studies})
+            )
+            resp = TestClient(app).post("/visualize", json={"query": "x trials by phase"})
+    finally:
+        app.dependency_overrides.clear()
+
+    body = resp.json()
+    assert body["status"] == "ok"
+    assert any("concentrated" in note for note in body["meta"]["advisories"])

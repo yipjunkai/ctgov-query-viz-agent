@@ -572,6 +572,10 @@ function showMeta(m) {
     parts.push('<div class="interp"><span class="lbl">Assumptions</span>' +
       m.assumptions.map(escapeHtml).join("<br>") + "</div>");
   }
+  if (Array.isArray(m.advisories) && m.advisories.length) {
+    parts.push('<div class="interp"><span class="lbl">⚠ Chart advisory</span>' +
+      m.advisories.map(escapeHtml).join("<br>") + "</div>");
+  }
   $("metaExtra").innerHTML = parts.join("");
   show("metaExtra", parts.length > 0);
   $("metaExtra").classList.toggle("hidden", parts.length === 0);

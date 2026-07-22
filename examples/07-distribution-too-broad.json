@@ -177,6 +177,7 @@
         "3,663 of 16,631 trials report no phase and are excluded from the breakdown.",
         "A trial can report more than one phase; it is counted once per phase, so counts can exceed the trial total."
       ],
+      "advisories": [],
       "truncated": false
     }
   }
