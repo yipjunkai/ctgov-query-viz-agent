@@ -1,0 +1,140 @@
+{
+  "studies": [
+    {
+      "protocolSection": {
+        "armsInterventionsModule": {
+          "interventions": [
+            {
+              "name": "tvs-CTL Vaccine",
+              "type": "BIOLOGICAL"
+            }
+          ]
+        },
+        "contactsLocationsModule": {
+          "locations": [
+            {
+              "country": "United States"
+            }
+          ]
+        },
+        "designModule": {
+          "phases": [
+            "PHASE1"
+          ],
+          "studyType": "INTERVENTIONAL"
+        },
+        "identificationModule": {
+          "briefTitle": "Vaccine Enriched, Autologous, Activated T-Cells Directed to Tumor in Patients With Relapsed/Refractory Melanoma",
+          "nctId": "NCT02482532"
+        },
+        "sponsorCollaboratorsModule": {
+          "leadSponsor": {
+            "class": "OTHER",
+            "name": "Gary Doolittle"
+          }
+        },
+        "statusModule": {
+          "overallStatus": "COMPLETED",
+          "startDateStruct": {
+            "date": "2016-10-06"
+          }
+        }
+      }
+    },
+    {
+      "protocolSection": {
+        "armsInterventionsModule": {
+          "interventions": [
+            {
+              "name": "Cord Blood-derived Expanded Allogeneic Natural Killer Cells",
+              "type": "BIOLOGICAL"
+            },
+            {
+              "name": "Cyclophosphamide",
+              "type": "DRUG"
+            },
+            {
+              "name": "Etoposide",
+              "type": "DRUG"
+            }
+          ]
+        },
+        "contactsLocationsModule": {
+          "locations": [
+            {
+              "country": "United States"
+            }
+          ]
+        },
+        "designModule": {
+          "phases": [
+            "PHASE1"
+          ],
+          "studyType": "INTERVENTIONAL"
+        },
+        "identificationModule": {
+          "briefTitle": "Donor Natural Killer Cells, Cyclophosphamide, and Etoposide in Treating Children and Young Adults With Relapsed or Refractory Solid Tumors",
+          "nctId": "NCT03420963"
+        },
+        "sponsorCollaboratorsModule": {
+          "leadSponsor": {
+            "class": "OTHER",
+            "name": "M.D. Anderson Cancer Center"
+          }
+        },
+        "statusModule": {
+          "overallStatus": "TERMINATED",
+          "startDateStruct": {
+            "date": "2018-08-31"
+          }
+        }
+      }
+    },
+    {
+      "protocolSection": {
+        "armsInterventionsModule": {
+          "interventions": [
+            {
+              "name": "blood and tissue samples",
+              "type": "DIAGNOSTIC_TEST"
+            },
+            {
+              "name": "blood and tissue samples",
+              "type": "OTHER"
+            }
+          ]
+        },
+        "contactsLocationsModule": {
+          "locations": [
+            {
+              "country": "United States"
+            },
+            {
+              "country": "United States"
+            }
+          ]
+        },
+        "designModule": {
+          "studyType": "OBSERVATIONAL"
+        },
+        "identificationModule": {
+          "briefTitle": "Pan-tumor MRD Study",
+          "nctId": "NCT06605404"
+        },
+        "sponsorCollaboratorsModule": {
+          "leadSponsor": {
+            "class": "INDUSTRY",
+            "name": "Paradigm Health"
+          }
+        },
+        "statusModule": {
+          "overallStatus": "RECRUITING",
+          "startDateStruct": {
+            "date": "2025-01-08"
+          }
+        }
+      }
+    }
+  ],
+  "totalCount": 3736
+}
