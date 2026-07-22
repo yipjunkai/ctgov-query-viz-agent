@@ -7,8 +7,11 @@ planning, so explicit user input always wins over the model.
 
 from typing import Any
 
+import httpx
+
 from ctgov_agent.api.schemas import (
     AgentResponse,
+    ClarificationResponse,
     Meta,
     OkResponse,
     RefusedResponse,
@@ -101,10 +104,32 @@ def _no_data(
     return RefusedResponse(reason="no_data", message=message)
 
 
+# Refuse rather than aggregate a match set too large to count exactly. Well under the paging
+# backstop so exact aggregation stays exact.
+DEFAULT_TOO_BROAD_THRESHOLD = 10000
+
+
+class RefusalSignal(Exception):
+    """Raised inside the engine to abort a run into a typed refusal (e.g. the too-broad guard)."""
+
+    def __init__(self, reason: str, message: str, detail: dict[str, Any] | None = None) -> None:
+        super().__init__(message)
+        self.reason = reason
+        self.message = message
+        self.detail = detail or {}
+
+
 class Pipeline:
-    def __init__(self, planner: Planner, client: CtgovClient) -> None:
+    def __init__(
+        self,
+        planner: Planner,
+        client: CtgovClient,
+        *,
+        too_broad_threshold: int = DEFAULT_TOO_BROAD_THRESHOLD,
+    ) -> None:
         self._planner = planner
         self._client = client
+        self._too_broad_threshold = too_broad_threshold
 
     async def aclose(self) -> None:
         await self._client.aclose()
@@ -117,9 +142,19 @@ class Pipeline:
         try:
             plan = await self._planner.plan(request.query, hints)
         except PlannerError as exc:
+            if exc.reason == "ambiguous":
+                return ClarificationResponse(question=exc.message)
             return RefusedResponse(reason=exc.reason, message=exc.message)
         plan = _merge_hints(plan, request)
-        return await self._dispatch(plan)
+        try:
+            return await self._dispatch(plan)
+        except RefusalSignal as exc:
+            return RefusedResponse(reason=exc.reason, message=exc.message, detail=exc.detail)
+        except httpx.HTTPError as exc:
+            return RefusedResponse(
+                reason="upstream_error",
+                message=f"The ClinicalTrials.gov request failed: {exc}",
+            )
 
     async def _dispatch(self, plan: QueryPlan) -> AgentResponse:
         if isinstance(plan, DistributionPlan):
@@ -137,6 +172,13 @@ class Pipeline:
     async def _fetch(self, filters: Filters) -> tuple[int, list[StudyRecord]]:
         params = build_query_params(filters)
         total = await self._client.count(params)
+        if total > self._too_broad_threshold:
+            raise RefusalSignal(
+                "too_broad",
+                f"About {total:,} trials match — too many to aggregate exactly. Add a filter "
+                f"(condition, drug, phase, or year range) to narrow the query.",
+                {"total": total, "threshold": self._too_broad_threshold},
+            )
         studies = await self._client.search(params)
         return total, [parse_study(study) for study in studies]
 

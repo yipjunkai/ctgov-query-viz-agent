@@ -19,7 +19,12 @@ from ctgov_agent.planner.factory import build_planner
 
 # Default pipeline, wired from configuration: LLM planner if a key is set, else the rule-based
 # fallback. Tests override get_pipeline to inject a fake planner and mocked client.
-_default_pipeline = Pipeline(build_planner(get_settings()), CtgovClient())
+_settings = get_settings()
+_default_pipeline = Pipeline(
+    build_planner(_settings),
+    CtgovClient(),
+    too_broad_threshold=_settings.too_broad_threshold,
+)
 
 
 def get_pipeline() -> Pipeline:
