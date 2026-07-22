@@ -31,6 +31,7 @@ DEFAULT_MAX_RECORDS = 15000
 DEFAULT_FIELDS: tuple[str, ...] = (
     "NCTId",
     "BriefTitle",
+    "Condition",
     "Phase",
     "StudyType",
     "OverallStatus",

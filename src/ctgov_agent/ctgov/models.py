@@ -28,6 +28,7 @@ class StudyRecord:
     intervention_names: tuple[str, ...]
     countries: tuple[str, ...]
     raw: Mapping[str, Any]
+    conditions: tuple[str, ...] = ()
 
 
 def _section(value: Any) -> dict[str, Any]:
@@ -84,6 +85,7 @@ def parse_study(study: Mapping[str, Any]) -> StudyRecord:
     return StudyRecord(
         nct_id=_opt_str(ident.get("nctId")) or "",
         brief_title=_opt_str(ident.get("briefTitle")),
+        conditions=_str_list(_section(ps.get("conditionsModule")).get("conditions")),
         phases=_str_list(design.get("phases")),
         study_type=_opt_str(design.get("studyType")),
         status=_opt_str(status_mod.get("overallStatus")),

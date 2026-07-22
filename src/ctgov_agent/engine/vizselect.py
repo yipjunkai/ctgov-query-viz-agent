@@ -5,9 +5,26 @@ distribution over a categorical dimension is a bar chart, ordered by canonical p
 dimension is phase and by descending count otherwise.
 """
 
-from ctgov_agent.api.schemas import Channel, ChartVisualization, DataPoint, Encoding, VizType
+from ctgov_agent.api.schemas import (
+    Channel,
+    ChartVisualization,
+    DataPoint,
+    Edge,
+    Encoding,
+    NetworkEncoding,
+    NetworkVisualization,
+    Node,
+    VizType,
+)
 from ctgov_agent.engine.aggregate import Bucket
-from ctgov_agent.planner.ir import CategoricalDim, ComparisonPlan, DistributionPlan, Filters
+from ctgov_agent.engine.network import GraphEdge, GraphNode
+from ctgov_agent.planner.ir import (
+    CategoricalDim,
+    ComparisonPlan,
+    DistributionPlan,
+    Filters,
+    NetworkPlan,
+)
 from ctgov_agent.vocab.controlled import Phase, humanize
 
 _DIM_LABEL: dict[CategoricalDim, str] = {
@@ -134,3 +151,20 @@ def comparison_chart(
         data=data,
     )
     return viz, "grouped by series"
+
+
+def network_graph(
+    plan: NetworkPlan, nodes: list[GraphNode], edges: list[GraphEdge]
+) -> tuple[NetworkVisualization, str]:
+    """Node-link graph; node size = trials the entity appears in, edge weight = shared trials."""
+    src, dst = plan.endpoints
+    ordered_nodes = sorted(nodes, key=lambda n: (-n.trial_count, n.id))
+    viz = NetworkVisualization(
+        title=f"{humanize(src.value)}-{humanize(dst.value)} network{_title_suffix(plan.filters)}",
+        encoding=NetworkEncoding(),
+        nodes=[
+            Node(id=n.id, label=n.label, kind=n.kind, value=n.trial_count) for n in ordered_nodes
+        ],
+        edges=[Edge(source=e.source, target=e.target, weight=e.weight) for e in edges],
+    )
+    return viz, "edges by weight desc"

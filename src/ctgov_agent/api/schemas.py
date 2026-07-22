@@ -70,6 +70,18 @@ class Edge(BaseModel):
     citations: list[Citation] = []
 
 
+class NetworkEncoding(BaseModel):
+    """Which node/edge fields carry each visual channel, so a renderer needs no guessing."""
+
+    node_id: str = "id"
+    node_label: str = "label"
+    node_kind: str = "kind"
+    node_size: str = "value"
+    edge_source: str = "source"
+    edge_target: str = "target"
+    edge_weight: str = "weight"
+
+
 class ChartVisualization(BaseModel):
     kind: Literal["chart"] = "chart"
     type: VizType
@@ -82,7 +94,7 @@ class NetworkVisualization(BaseModel):
     kind: Literal["network"] = "network"
     type: Literal[VizType.network_graph] = VizType.network_graph
     title: str
-    encoding: Encoding
+    encoding: NetworkEncoding
     nodes: list[Node]
     edges: list[Edge]
 

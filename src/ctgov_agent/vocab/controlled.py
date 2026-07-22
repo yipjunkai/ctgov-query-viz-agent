@@ -103,6 +103,7 @@ SNAPSHOT_PIECE: dict[type[StrEnum], str] = {
 FIELD_PATHS: dict[str, str] = {
     "nct_id": "protocolSection.identificationModule.nctId",
     "brief_title": "protocolSection.identificationModule.briefTitle",
+    "condition": "protocolSection.conditionsModule.conditions",
     "phase": "protocolSection.designModule.phases",
     "study_type": "protocolSection.designModule.studyType",
     "status": "protocolSection.statusModule.overallStatus",

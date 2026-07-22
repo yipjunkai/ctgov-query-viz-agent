@@ -23,10 +23,12 @@ from ctgov_agent.engine.aggregate import (
     aggregate_by_year,
 )
 from ctgov_agent.engine.executor import build_query_params, combine_filters
+from ctgov_agent.engine.network import build_network
 from ctgov_agent.engine.vizselect import (
     comparison_chart,
     distribution_chart,
     geographic_chart,
+    network_graph,
     time_series_chart,
 )
 from ctgov_agent.planner.base import Planner, PlannerError
@@ -35,6 +37,7 @@ from ctgov_agent.planner.ir import (
     DistributionPlan,
     Filters,
     GeographicPlan,
+    NetworkPlan,
     QueryPlan,
     TimeTrendPlan,
 )
@@ -127,10 +130,9 @@ class Pipeline:
             return await self._run_geographic(plan)
         if isinstance(plan, ComparisonPlan):
             return await self._run_comparison(plan)
-        return RefusedResponse(
-            reason="unsupported_intent",
-            message=f"The '{plan.intent}' intent is not yet supported.",
-        )
+        # NetworkPlan is the only remaining variant; a new intent would fail typecheck here,
+        # which is the signal to add its branch.
+        return await self._run_network(plan)
 
     async def _fetch(self, filters: Filters) -> tuple[int, list[StudyRecord]]:
         params = build_query_params(filters)
@@ -197,3 +199,13 @@ class Pipeline:
             truncated=False,
         )
         return OkResponse(visualization=viz, meta=meta)
+
+    async def _run_network(self, plan: NetworkPlan) -> AgentResponse:
+        total, records = await self._fetch(plan.filters)
+        nodes, edges = build_network(records, plan.endpoints)
+        if not edges:
+            return _no_data("No co-occurring entities were found to build a network.")
+        viz, sort_desc = network_graph(plan, nodes, edges)
+        return OkResponse(
+            visualization=viz, meta=_build_meta(total, records, plan.filters, plan.notes, sort_desc)
+        )
