@@ -177,6 +177,7 @@
         "A trial can report more than one phase; it is counted once per phase, so counts can exceed the trial total."
       ],
       "advisories": [],
+      "resolved_entities": [],
       "truncated": false
     }
   }

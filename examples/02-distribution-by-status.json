@@ -28,17 +28,17 @@
           "series": null,
           "citations": [
             {
-              "nct_id": "NCT02955758",
+              "nct_id": "NCT02733250",
               "excerpt": "COMPLETED",
               "field": "status"
             },
             {
-              "nct_id": "NCT02296684",
+              "nct_id": "NCT02538510",
               "excerpt": "COMPLETED",
               "field": "status"
             },
             {
-              "nct_id": "NCT05159778",
+              "nct_id": "NCT02130466",
               "excerpt": "COMPLETED",
               "field": "status"
             }
@@ -47,21 +47,21 @@
         {
           "key": "RECRUITING",
           "label": "Recruiting",
-          "value": 707,
+          "value": 708,
           "series": null,
           "citations": [
             {
-              "nct_id": "NCT06384352",
+              "nct_id": "NCT04645602",
               "excerpt": "RECRUITING",
               "field": "status"
             },
             {
-              "nct_id": "NCT05547321",
+              "nct_id": "NCT07043972",
               "excerpt": "RECRUITING",
               "field": "status"
             },
             {
-              "nct_id": "NCT05679921",
+              "nct_id": "NCT06896422",
               "excerpt": "RECRUITING",
               "field": "status"
             }
@@ -70,21 +70,21 @@
         {
           "key": "ACTIVE_NOT_RECRUITING",
           "label": "Active Not Recruiting",
-          "value": 488,
+          "value": 486,
           "series": null,
           "citations": [
             {
-              "nct_id": "NCT05215340",
+              "nct_id": "NCT03978624",
               "excerpt": "ACTIVE_NOT_RECRUITING",
               "field": "status"
             },
             {
-              "nct_id": "NCT06205706",
+              "nct_id": "NCT02411656",
               "excerpt": "ACTIVE_NOT_RECRUITING",
               "field": "status"
             },
             {
-              "nct_id": "NCT06212752",
+              "nct_id": "NCT03463460",
               "excerpt": "ACTIVE_NOT_RECRUITING",
               "field": "status"
             }
@@ -93,21 +93,21 @@
         {
           "key": "TERMINATED",
           "label": "Terminated",
-          "value": 364,
+          "value": 366,
           "series": null,
           "citations": [
             {
-              "nct_id": "NCT03769532",
+              "nct_id": "NCT02934503",
               "excerpt": "TERMINATED",
               "field": "status"
             },
             {
-              "nct_id": "NCT03287817",
+              "nct_id": "NCT04418661",
               "excerpt": "TERMINATED",
               "field": "status"
             },
             {
-              "nct_id": "NCT05346484",
+              "nct_id": "NCT03019588",
               "excerpt": "TERMINATED",
               "field": "status"
             }
@@ -120,17 +120,17 @@
           "series": null,
           "citations": [
             {
-              "nct_id": "NCT06000358",
+              "nct_id": "NCT05573282",
               "excerpt": "UNKNOWN",
               "field": "status"
             },
             {
-              "nct_id": "NCT03639948",
+              "nct_id": "NCT05647954",
               "excerpt": "UNKNOWN",
               "field": "status"
             },
             {
-              "nct_id": "NCT02977468",
+              "nct_id": "NCT04964479",
               "excerpt": "UNKNOWN",
               "field": "status"
             }
@@ -139,21 +139,21 @@
         {
           "key": "NOT_YET_RECRUITING",
           "label": "Not Yet Recruiting",
-          "value": 145,
+          "value": 147,
           "series": null,
           "citations": [
             {
-              "nct_id": "NCT07552558",
+              "nct_id": "NCT07545486",
               "excerpt": "NOT_YET_RECRUITING",
               "field": "status"
             },
             {
-              "nct_id": "NCT06093425",
+              "nct_id": "NCT04901741",
               "excerpt": "NOT_YET_RECRUITING",
               "field": "status"
             },
             {
-              "nct_id": "NCT06028633",
+              "nct_id": "NCT06714266",
               "excerpt": "NOT_YET_RECRUITING",
               "field": "status"
             }
@@ -166,17 +166,17 @@
           "series": null,
           "citations": [
             {
-              "nct_id": "NCT04703426",
+              "nct_id": "NCT05171062",
               "excerpt": "WITHDRAWN",
               "field": "status"
             },
             {
-              "nct_id": "NCT03901378",
+              "nct_id": "NCT06528210",
               "excerpt": "WITHDRAWN",
               "field": "status"
             },
             {
-              "nct_id": "NCT05093387",
+              "nct_id": "NCT03617224",
               "excerpt": "WITHDRAWN",
               "field": "status"
             }
@@ -189,17 +189,17 @@
           "series": null,
           "citations": [
             {
-              "nct_id": "NCT04266730",
+              "nct_id": "NCT04866810",
               "excerpt": "SUSPENDED",
               "field": "status"
             },
             {
-              "nct_id": "NCT04754321",
+              "nct_id": "NCT06219174",
               "excerpt": "SUSPENDED",
               "field": "status"
             },
             {
-              "nct_id": "NCT05101356",
+              "nct_id": "NCT03316573",
               "excerpt": "SUSPENDED",
               "field": "status"
             }
@@ -212,17 +212,17 @@
           "series": null,
           "citations": [
             {
+              "nct_id": "NCT07633353",
+              "excerpt": "ENROLLING_BY_INVITATION",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT04361370",
+              "excerpt": "ENROLLING_BY_INVITATION",
+              "field": "status"
+            },
+            {
               "nct_id": "NCT02600949",
-              "excerpt": "ENROLLING_BY_INVITATION",
-              "field": "status"
-            },
-            {
-              "nct_id": "NCT05745233",
-              "excerpt": "ENROLLING_BY_INVITATION",
-              "field": "status"
-            },
-            {
-              "nct_id": "NCT06204614",
               "excerpt": "ENROLLING_BY_INVITATION",
               "field": "status"
             }
@@ -235,17 +235,17 @@
           "series": null,
           "citations": [
             {
-              "nct_id": "NCT03311542",
-              "excerpt": "NO_LONGER_AVAILABLE",
-              "field": "status"
-            },
-            {
-              "nct_id": "NCT02083484",
-              "excerpt": "NO_LONGER_AVAILABLE",
-              "field": "status"
-            },
-            {
               "nct_id": "NCT04135092",
+              "excerpt": "NO_LONGER_AVAILABLE",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT04194190",
+              "excerpt": "NO_LONGER_AVAILABLE",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT03311542",
               "excerpt": "NO_LONGER_AVAILABLE",
               "field": "status"
             }
@@ -268,8 +268,8 @@
     },
     "meta": {
       "source": "clinicaltrials.gov",
-      "total_trials_matched": 2906,
-      "trials_aggregated": 2906,
+      "total_trials_matched": 2909,
+      "trials_aggregated": 2909,
       "trials_unclassified": 0,
       "filters_applied": {
         "intervention": "Pembrolizumab"
@@ -279,6 +279,16 @@
       "sort": "value desc",
       "assumptions": [],
       "advisories": [],
+      "resolved_entities": [
+        {
+          "input": "Pembrolizumab",
+          "canonical": "Pembrolizumab",
+          "synonyms": [
+            "Keytruda",
+            "MK-3475"
+          ]
+        }
+      ],
       "truncated": false
     }
   }

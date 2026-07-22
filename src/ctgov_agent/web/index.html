@@ -576,6 +576,13 @@ function showMeta(m) {
     parts.push('<div class="interp"><span class="lbl">⚠ Chart advisory</span>' +
       m.advisories.map(escapeHtml).join("<br>") + "</div>");
   }
+  if (Array.isArray(m.resolved_entities) && m.resolved_entities.length) {
+    const lines = m.resolved_entities.map((e) => {
+      const aliases = (e.synonyms || []).length ? " (aka " + e.synonyms.map(escapeHtml).join(", ") + ")" : "";
+      return escapeHtml(e.input) + " → <b>" + escapeHtml(e.canonical) + "</b>" + aliases;
+    });
+    parts.push('<div class="interp"><span class="lbl">Resolved entities</span>' + lines.join("<br>") + "</div>");
+  }
   $("metaExtra").innerHTML = parts.join("");
   show("metaExtra", parts.length > 0);
   $("metaExtra").classList.toggle("hidden", parts.length === 0);

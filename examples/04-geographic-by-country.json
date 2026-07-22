@@ -1686,6 +1686,7 @@
         "A trial can report more than one country; it is counted once per country, so counts can exceed the trial total."
       ],
       "advisories": [],
+      "resolved_entities": [],
       "truncated": false
     }
   }

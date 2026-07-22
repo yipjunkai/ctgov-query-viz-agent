@@ -15,6 +15,7 @@ from ctgov_agent.api.schemas import (
     Meta,
     OkResponse,
     RefusedResponse,
+    ResolvedEntity,
     VisualizeRequest,
 )
 from ctgov_agent.ctgov.client import DEFAULT_MAX_RECORDS, CtgovClient
@@ -61,6 +62,7 @@ from ctgov_agent.planner.ir import (
     TimeTrendPlan,
 )
 from ctgov_agent.vocab.controlled import humanize
+from ctgov_agent.vocab.entities import resolve_drug
 
 
 def _hints_from_request(req: VisualizeRequest) -> Filters:
@@ -124,6 +126,40 @@ def _reconciliation_notes(
     return notes
 
 
+def _resolved_entities(*names: str | None) -> list[ResolvedEntity]:
+    """Canonicalize any recognized drug names, one entry per distinct canonical entity."""
+    out: list[ResolvedEntity] = []
+    seen: set[str] = set()
+    for name in names:
+        if not name:
+            continue
+        entity = resolve_drug(name)
+        if entity is None or entity.canonical in seen:
+            continue
+        seen.add(entity.canonical)
+        out.append(
+            ResolvedEntity(input=name, canonical=entity.canonical, synonyms=list(entity.synonyms))
+        )
+    return out
+
+
+def _same_drug_advisories(plan: ComparisonPlan) -> list[str]:
+    """Flag comparison series that resolve to the same drug (e.g. Keytruda vs Pembrolizumab)."""
+    groups: dict[str, list[str]] = {}
+    for series in plan.series:
+        if not series.filters.intervention:
+            continue
+        entity = resolve_drug(series.filters.intervention)
+        if entity is not None:
+            groups.setdefault(entity.canonical, []).append(series.label)
+    return [
+        f"Series {' and '.join(labels)} resolve to the same drug ({canonical}) — "
+        f"this compares it with itself."
+        for canonical, labels in groups.items()
+        if len(labels) > 1
+    ]
+
+
 def _build_meta(
     total: int,
     records: list[StudyRecord],
@@ -144,6 +180,7 @@ def _build_meta(
         sort=sort,
         assumptions=assumptions or [],
         advisories=advisories or [],
+        resolved_entities=_resolved_entities(filters.intervention),
         truncated=len(records) >= DEFAULT_MAX_RECORDS,
     )
 
@@ -330,6 +367,7 @@ class Pipeline:
             sort=sort_desc,
             assumptions=assumptions,
             advisories=distribution_advisories(buckets, noun),
+            resolved_entities=_resolved_entities(plan.filters.intervention),
             truncated=False,
         )
         return OkResponse(visualization=viz, meta=meta)
@@ -415,7 +453,10 @@ class Pipeline:
             assumptions=_reconciliation_notes(
                 Reconciliation(unclassified, multivalue), aggregated, noun, "comparison"
             ),
-            advisories=comparison_advisories(series_results),
+            advisories=comparison_advisories(series_results) + _same_drug_advisories(plan),
+            resolved_entities=_resolved_entities(
+                plan.base_filters.intervention, *(s.filters.intervention for s in plan.series)
+            ),
             truncated=False,
         )
         return OkResponse(visualization=viz, meta=meta)

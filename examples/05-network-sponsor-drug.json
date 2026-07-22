@@ -1674,6 +1674,7 @@
       "sort": "edges by weight desc",
       "assumptions": [],
       "advisories": [],
+      "resolved_entities": [],
       "truncated": false
     }
   }

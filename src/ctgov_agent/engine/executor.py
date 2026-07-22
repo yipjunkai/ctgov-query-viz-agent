@@ -20,6 +20,7 @@ from ctgov_agent.vocab.controlled import (
     Status,
     StudyType,
 )
+from ctgov_agent.vocab.entities import resolve_drug
 
 
 def _append_enum_clause(clauses: list[str], area: str, values: Sequence[StrEnum] | None) -> None:
@@ -60,7 +61,10 @@ def build_query_params(filters: Filters) -> dict[str, str]:
     if filters.condition:
         params["query.cond"] = filters.condition
     if filters.intervention:
-        params["query.intr"] = filters.intervention
+        # Resolve a known drug to the union of its synonyms (canonical + brand + code). CT.gov
+        # mostly normalizes these itself, but imperfectly — the OR term recovers the full set.
+        entity = resolve_drug(filters.intervention)
+        params["query.intr"] = entity.query_term if entity else filters.intervention
     if filters.sponsor:
         params["query.spons"] = filters.sponsor
     if filters.country:

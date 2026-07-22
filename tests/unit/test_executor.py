@@ -13,16 +13,21 @@ from ctgov_agent.vocab.controlled import InterventionType, Phase, SponsorClass, 
 
 def test_entity_and_location_filters() -> None:
     params = build_query_params(
-        Filters(
-            condition="melanoma", intervention="Pembrolizumab", sponsor="Merck", country="France"
-        )
+        Filters(condition="melanoma", intervention="UnknownDrug", sponsor="Merck", country="France")
     )
     assert params == {
         "query.cond": "melanoma",
-        "query.intr": "Pembrolizumab",
+        "query.intr": "UnknownDrug",  # unrecognized drug passes through verbatim
         "query.spons": "Merck",
         "query.locn": "France",
     }
+
+
+def test_known_drug_is_or_expanded_to_its_synonyms() -> None:
+    # A recognized brand name is searched as the union of the drug's names (CT.gov normalizes most
+    # of these itself, but imperfectly — the OR recovers the full trial set).
+    params = build_query_params(Filters(intervention="Keytruda"))
+    assert params["query.intr"] == "Pembrolizumab OR Keytruda OR MK-3475"
 
 
 def test_status_is_pipe_joined() -> None:

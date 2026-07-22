@@ -115,3 +115,28 @@ def test_comparison_produces_grouped_bar() -> None:
     assert points[("Drug A", "PHASE2")] == 1
     assert points[("Drug A", "PHASE3")] == 1
     assert points[("Drug B", "PHASE2")] == 1
+
+
+def test_comparison_flags_same_drug_series() -> None:
+    # Keytruda and Pembrolizumab are the same drug; the comparison should notice.
+    plan = ComparisonPlan(
+        intent="comparison",
+        dimension=CategoricalDim.phase,
+        series=[
+            Series(label="Keytruda", filters=Filters(intervention="Keytruda")),
+            Series(label="Pembrolizumab", filters=Filters(intervention="Pembrolizumab")),
+        ],
+    )
+    a = [_study("A1", phase="PHASE2"), _study("A2", phase="PHASE3")]
+    b = [_study("B1", phase="PHASE2")]
+    responses = [
+        httpx.Response(200, json=_payload(a, total=2)),
+        httpx.Response(200, json=_payload(a, total=2)),
+        httpx.Response(200, json=_payload(b, total=1)),
+        httpx.Response(200, json=_payload(b, total=1)),
+    ]
+    body = _post(plan, "compare Keytruda vs Pembrolizumab by phase", responses)
+
+    meta = body["meta"]
+    assert [e["canonical"] for e in meta["resolved_entities"]] == ["Pembrolizumab"]  # deduped
+    assert any("same drug" in note for note in meta["advisories"])
