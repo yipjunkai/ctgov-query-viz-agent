@@ -46,6 +46,15 @@ curl -s localhost:8000/visualize -H 'content-type: application/json' \
   -d '{"query": "How are melanoma trials distributed across phases?", "condition": "melanoma"}' | jq
 ```
 
+## Demo (optional)
+
+`just run`, then open **http://127.0.0.1:8000/** for a self-contained page: type a question (or click
+an example chip), and it renders the response — charts via **Vega-Lite**, the network via a **Vega
+force-directed** graph — plus the response metadata and the deep-citation table. It's a pure consumer
+of the `/visualize` contract (no backend rendering logic), which is itself the proof the schema is
+frontend-friendly. The page loads Vega from a CDN, so it needs internet for the rendering libs (the
+API and data path don't).
+
 ## Request schema
 
 `POST /visualize` — `query` is required; the optional structured fields, when supplied,

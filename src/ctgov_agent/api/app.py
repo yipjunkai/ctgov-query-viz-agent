@@ -7,9 +7,11 @@ and a mocked client.
 
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends, FastAPI
+from fastapi.responses import HTMLResponse
 
 from ctgov_agent.api.schemas import AgentResponse, VisualizeRequest
 from ctgov_agent.config import get_settings
@@ -42,6 +44,15 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+
+
+_WEB_DIR = Path(__file__).resolve().parent.parent / "web"
+
+
+@app.get("/", response_class=HTMLResponse)
+def demo() -> HTMLResponse:
+    """Serve the self-contained demo page (a pure consumer of the /visualize contract)."""
+    return HTMLResponse((_WEB_DIR / "index.html").read_text())
 
 
 @app.get("/health")

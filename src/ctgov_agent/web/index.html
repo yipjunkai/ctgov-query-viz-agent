@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClinicalTrials.gov Query-to-Visualization Agent</title>
+  <!-- vega-embed bundles Vega + Vega-Lite. Loaded from a CDN, so this page needs internet for the
+       rendering libs; the API and its data path do not. -->
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+  <style>
+    :root { --bg:#f7f8fa; --card:#fff; --line:#e6e8eb; --ink:#1c2530; --muted:#6b7684; --accent:#2f6feb; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+           background:var(--bg); color:var(--ink); line-height:1.5; }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 28px 20px 64px; }
+    header h1 { font-size: 20px; margin:0 0 4px; }
+    header p { color:var(--muted); margin:0 0 20px; font-size:14px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px; margin-bottom:18px; }
+    form { display:grid; gap:10px; }
+    .q-row { display:flex; gap:8px; }
+    input[type=text] { width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; font-size:14px; }
+    .fields { display:grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap:8px; }
+    .fields input { font-size:13px; padding:8px 10px; }
+    button { background:var(--accent); color:#fff; border:0; border-radius:8px; padding:10px 18px;
+             font-size:14px; font-weight:600; cursor:pointer; }
+    button:disabled { opacity:.6; cursor:default; }
+    .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
+    .chip { background:#eef2f8; color:var(--accent); border:1px solid #dbe6fb; border-radius:999px;
+            padding:6px 12px; font-size:12.5px; cursor:pointer; }
+    label.small { font-size:11px; color:var(--muted); display:block; margin:0 0 2px 2px; }
+    #vis { width:100%; min-height:40px; }
+    .meta { display:grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap:12px; font-size:13px; }
+    .meta .k { color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.03em; }
+    .meta .v { font-weight:600; }
+    table { width:100%; border-collapse:collapse; font-size:12.5px; }
+    th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+    th { color:var(--muted); font-weight:600; }
+    td.excerpt { color:var(--ink); }
+    a { color:var(--accent); text-decoration:none; }
+    .banner { border-radius:10px; padding:14px 16px; font-size:14px; }
+    .banner.refused { background:#fdf0ef; border:1px solid #f6d4d1; color:#a12b22; }
+    .banner.clarify { background:#fff8e6; border:1px solid #f2e0a8; color:#8a6d1a; }
+    .banner.error { background:#fdf0ef; border:1px solid #f6d4d1; color:#a12b22; }
+    .status { color:var(--muted); font-size:13px; }
+    h2.section { font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin:0 0 12px; }
+    details summary { cursor:pointer; color:var(--muted); font-size:12.5px; }
+    pre { background:#0f1722; color:#d6e2f0; padding:12px; border-radius:8px; overflow:auto; font-size:12px; }
+    .hidden { display:none; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>ClinicalTrials.gov Query-to-Visualization Agent</h1>
+      <p>Ask a question about clinical trials — the agent plans it, fetches real data, and returns a
+         visualization spec. The LLM never emits a number; every value is computed from records.</p>
+    </header>
+
+    <div class="card">
+      <form id="form">
+        <div class="q-row">
+          <input type="text" id="query" placeholder="e.g. How are melanoma trials distributed across phases?" required />
+          <button type="submit" id="go">Visualize</button>
+        </div>
+        <div class="fields">
+          <div><label class="small">condition</label><input type="text" id="condition" placeholder="melanoma" /></div>
+          <div><label class="small">drug_name</label><input type="text" id="drug_name" placeholder="Pembrolizumab" /></div>
+          <div><label class="small">country</label><input type="text" id="country" /></div>
+          <div><label class="small">start_year</label><input type="text" id="start_year" inputmode="numeric" /></div>
+          <div><label class="small">end_year</label><input type="text" id="end_year" inputmode="numeric" /></div>
+        </div>
+        <div class="chips" id="chips"></div>
+      </form>
+    </div>
+
+    <div id="statusCard" class="card hidden"><span class="status" id="status"></span></div>
+    <div id="bannerCard" class="card hidden"><div id="banner" class="banner"></div></div>
+
+    <div id="resultCard" class="card hidden">
+      <div id="vis"></div>
+      <details style="margin-top:10px"><summary>View generated Vega / Vega-Lite spec</summary>
+        <pre id="specDump" class="code"></pre></details>
+    </div>
+
+    <div id="metaCard" class="card hidden">
+      <h2 class="section">Response metadata</h2>
+      <div class="meta" id="meta"></div>
+    </div>
+
+    <div id="citeCard" class="card hidden">
+      <h2 class="section">Deep citations <span id="citeNote" style="text-transform:none;font-weight:400"></span></h2>
+      <table><thead><tr><th>Datum</th><th>Trial</th><th>Excerpt</th><th>Field</th></tr></thead>
+        <tbody id="citeBody"></tbody></table>
+    </div>
+  </div>
+
+<script>
+const EXAMPLES = [
+  ["Melanoma by phase", {query:"How are melanoma trials distributed across phases?", condition:"melanoma"}],
+  ["Pembrolizumab per year", {query:"How has the number of pembrolizumab trials changed per year?", drug_name:"Pembrolizumab", start_year:2015}],
+  ["Melanoma by country", {query:"Which countries have the most trials for melanoma?", condition:"melanoma"}],
+  ["Sponsor ↔ drug network", {query:"Show a network of sponsors and drugs for melanoma trials", condition:"melanoma"}],
+  ["Pembrolizumab by status", {query:"Break down pembrolizumab trials by recruitment status", drug_name:"Pembrolizumab"}],
+];
+
+const $ = (id) => document.getElementById(id);
+
+function show(id, on) { $(id).classList.toggle("hidden", !on); }
+
+const chips = $("chips");
+for (const [label, req] of EXAMPLES) {
+  const b = document.createElement("span");
+  b.className = "chip"; b.textContent = label;
+  b.onclick = () => { fillForm(req); submit(req); };
+  chips.appendChild(b);
+}
+
+function fillForm(req) {
+  $("query").value = req.query || "";
+  for (const k of ["condition","drug_name","country","start_year","end_year"]) $(k).value = req[k] ?? "";
+}
+
+function readForm() {
+  const req = { query: $("query").value.trim() };
+  for (const k of ["condition","drug_name","country"]) { const v = $(k).value.trim(); if (v) req[k] = v; }
+  for (const k of ["start_year","end_year"]) { const v = $(k).value.trim(); if (v) req[k] = Number(v); }
+  return req;
+}
+
+$("form").addEventListener("submit", (e) => { e.preventDefault(); submit(readForm()); });
+
+async function submit(req) {
+  if (!req.query) return;
+  $("go").disabled = true;
+  for (const c of ["bannerCard","resultCard","metaCard","citeCard"]) show(c, false);
+  show("statusCard", true); $("status").textContent = "Querying ClinicalTrials.gov…";
+  try {
+    const resp = await fetch("/visualize", {
+      method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(req),
+    });
+    render(await resp.json());
+  } catch (err) {
+    banner("error", "Request failed", String(err));
+  } finally {
+    show("statusCard", false); $("go").disabled = false;
+  }
+}
+
+function banner(kind, title, msg) {
+  show("bannerCard", true);
+  const el = $("banner"); el.className = "banner " + kind;
+  el.innerHTML = "<strong>" + title + "</strong><br>" + msg;
+}
+
+function render(body) {
+  if (body.status === "refused") { banner("refused", "Cannot process (" + body.reason + ")", body.message); return; }
+  if (body.status === "needs_clarification") { banner("clarify", "Needs clarification", body.question); return; }
+  const viz = body.visualization;
+  const spec = viz.kind === "network" ? networkSpec(viz) : chartSpec(viz);
+  show("resultCard", true);
+  vegaEmbed("#vis", spec, {actions: false, renderer: "canvas"}).catch((e) => banner("error", "Render failed", String(e)));
+  $("specDump").textContent = JSON.stringify(spec, null, 2);
+  showMeta(body.meta);
+  showCitations(viz);
+}
+
+function chartSpec(viz) {
+  const base = {
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    title: viz.title, data: {values: viz.data}, width: "container", height: 380,
+    config: {axis: {labelFontSize: 11, titleFontSize: 12}, view: {stroke: null}},
+  };
+  const xt = viz.encoding?.x?.label || "", yt = viz.encoding?.y?.label || "Trial count";
+  if (viz.type === "time_series") return {...base,
+    mark: {type: "line", point: true, tooltip: true, interpolate: "monotone"},
+    encoding: {x: {field: "key", type: "ordinal", sort: null, axis: {title: xt || "Start year"}},
+               y: {field: "value", type: "quantitative", axis: {title: yt}}}};
+  if (viz.type === "grouped_bar") return {...base, mark: {type: "bar", tooltip: true},
+    encoding: {x: {field: "label", type: "nominal", sort: null, axis: {title: xt, labelAngle: -30}},
+               xOffset: {field: "series"},
+               y: {field: "value", type: "quantitative", axis: {title: yt}},
+               color: {field: "series", type: "nominal", legend: {title: "Series"}}}};
+  if (viz.type === "choropleth") return {...base, mark: {type: "bar", tooltip: true},
+    encoding: {y: {field: "label", type: "nominal", sort: null, axis: {title: xt || "Country"}},
+               x: {field: "value", type: "quantitative", axis: {title: yt}}}};
+  return {...base, mark: {type: "bar", tooltip: true},
+    encoding: {x: {field: "label", type: "nominal", sort: null, axis: {title: xt, labelAngle: -30}},
+               y: {field: "value", type: "quantitative", axis: {title: yt}},
+               color: {value: "#2f6feb"}}};
+}
+
+function networkSpec(viz) {
+  const idx = {}; viz.nodes.forEach((n, i) => idx[n.id] = i);
+  const nodes = viz.nodes.map((n) => ({name: n.label, kind: n.kind, value: n.value}));
+  const links = viz.edges.map((e) => ({source: idx[e.source], target: idx[e.target], weight: e.weight}));
+  return {
+    "$schema": "https://vega.github.io/schema/vega/v5.json",
+    width: 860, height: 520, padding: 0, autosize: "none",
+    title: viz.title,
+    signals: [{name: "cx", update: "width/2"}, {name: "cy", update: "height/2"}],
+    data: [{name: "node-data", values: nodes}, {name: "link-data", values: links}],
+    scales: [
+      {name: "color", type: "ordinal", domain: {data: "node-data", field: "kind"}, range: {scheme: "tableau10"}},
+      {name: "size", type: "sqrt", domain: {data: "node-data", field: "value"}, range: [80, 900]},
+      {name: "width", type: "linear", domain: {data: "link-data", field: "weight"}, range: [1, 7]},
+    ],
+    legends: [{fill: "color", title: "Entity type", orient: "top-left"}],
+    marks: [
+      {
+        name: "nodes", type: "symbol", zindex: 1, from: {data: "node-data"},
+        encode: {
+          enter: {fill: {scale: "color", field: "kind"}, stroke: {value: "#fff"}, strokeWidth: {value: 1},
+                  tooltip: {signal: "datum.name + '  —  ' + datum.kind + ' · ' + datum.value + ' trials'"}},
+          update: {size: {scale: "size", field: "value"}, cursor: {value: "pointer"}},
+        },
+        transform: [{
+          type: "force", iterations: 300, static: true, signal: "force",
+          forces: [
+            {force: "center", x: {signal: "cx"}, y: {signal: "cy"}},
+            {force: "collide", radius: 18},
+            {force: "nbody", strength: -55},
+            {force: "link", links: "link-data", distance: 75},
+          ],
+        }],
+      },
+      {
+        type: "path", from: {data: "link-data"}, interactive: false, zindex: 0,
+        encode: {update: {stroke: {value: "#c3ccd6"}, strokeWidth: {scale: "width", field: "weight"},
+                          strokeOpacity: {value: 0.7},
+                          tooltip: {signal: "'shared trials: ' + datum.weight"}}},
+        transform: [{type: "linkpath", require: {signal: "force"}, shape: "line",
+                     sourceX: "datum.source.x", sourceY: "datum.source.y",
+                     targetX: "datum.target.x", targetY: "datum.target.y"}],
+      },
+    ],
+  };
+}
+
+function showMeta(m) {
+  show("metaCard", true);
+  const cell = (k, v) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`;
+  const filters = JSON.stringify(m.filters_applied || {});
+  $("meta").innerHTML =
+    cell("Trials matched", (m.total_trials_matched ?? "—").toLocaleString()) +
+    cell("Trials aggregated", (m.trials_aggregated ?? "—").toLocaleString()) +
+    cell("Sort", m.sort || "—") +
+    cell("Truncated", m.truncated ? "yes" : "no") +
+    cell("Filters applied", `<span class="code">${filters}</span>`) +
+    cell("Interpretation", m.query_interpretation || "—");
+}
+
+function nodeLabel(id) { const i = id.indexOf(":"); return i < 0 ? id : id.slice(i + 1); }
+
+function showCitations(viz) {
+  const rows = [];
+  if (viz.kind === "network") {
+    for (const e of viz.edges) for (const c of (e.citations || []))
+      rows.push([nodeLabel(e.source) + " ↔ " + nodeLabel(e.target), c]);
+  } else {
+    for (const d of viz.data) for (const c of (d.citations || [])) rows.push([d.label, c]);
+  }
+  if (!rows.length) { show("citeCard", false); return; }
+  show("citeCard", true);
+  const shown = rows.slice(0, 40);
+  $("citeNote").textContent = "— " + rows.length + " total (every excerpt is a verified substring of its source record)";
+  $("citeBody").innerHTML = shown.map(([ctx, c]) => {
+    const url = "https://clinicaltrials.gov/study/" + encodeURIComponent(c.nct_id);
+    return `<tr><td>${ctx}</td><td><a href="${url}" target="_blank" rel="noopener">${c.nct_id}</a></td>` +
+           `<td class="excerpt">${escapeHtml(c.excerpt)}</td><td class="code">${c.field ?? ""}</td></tr>`;
+  }).join("");
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"]/g, (ch) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[ch]));
+}
+</script>
+</body>
+</html>
