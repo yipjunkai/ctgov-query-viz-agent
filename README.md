@@ -313,6 +313,14 @@ examples/        # golden request → response runs
 docs/EVAL.md     # offline planner evaluation (harness in tools/eval/)
 ```
 
+## 🤖 How this was built
+
+Human-owned design, AI-accelerated execution: every load-bearing decision — the "LLM plans, code
+computes" seam, the intent-discriminated IR, client-side aggregation (chosen after probing the live
+API), the citation-verification invariant — was made deliberately, then implemented in thin slices
+behind the `just verify` gate. The full account — tools used, how correctness was validated, and a
+human-vs-AI attribution table — is in **[`docs/AGENT_USAGE.md`](docs/AGENT_USAGE.md)**.
+
 ## 📄 License
 
 MIT — see [`LICENSE`](LICENSE).
