@@ -105,6 +105,9 @@ class Meta(BaseModel):
     source: str = "clinicaltrials.gov"
     total_trials_matched: int
     trials_aggregated: int
+    # Of the aggregated trials, how many carried no value for the grouping and so appear in no
+    # bucket. Together with ``assumptions``, this reconciles the bars against the trial total.
+    trials_unclassified: int = 0
     filters_applied: dict[str, Any] = {}
     query_interpretation: str | None = None
     units: str = "trials"

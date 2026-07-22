@@ -554,6 +554,7 @@ function showMeta(m) {
   $("meta").innerHTML =
     stat("Trials matched", (m.total_trials_matched ?? 0).toLocaleString()) +
     stat("Trials aggregated", (m.trials_aggregated ?? 0).toLocaleString()) +
+    (m.trials_unclassified ? stat("Not classified", m.trials_unclassified.toLocaleString(), true) : "") +
     stat("Sort", escapeHtml(m.sort || "—"), true) +
     stat("Truncated", yn(m.truncated), true) +
     stat("Source", escapeHtml(m.source || "clinicaltrials.gov"), true);
@@ -566,6 +567,10 @@ function showMeta(m) {
   }
   if (m.query_interpretation) {
     parts.push('<div class="interp"><span class="lbl">Planner interpretation</span>' + escapeHtml(m.query_interpretation) + "</div>");
+  }
+  if (Array.isArray(m.assumptions) && m.assumptions.length) {
+    parts.push('<div class="interp"><span class="lbl">Assumptions</span>' +
+      m.assumptions.map(escapeHtml).join("<br>") + "</div>");
   }
   $("metaExtra").innerHTML = parts.join("");
   show("metaExtra", parts.length > 0);

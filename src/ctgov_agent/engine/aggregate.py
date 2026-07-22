@@ -6,6 +6,7 @@ number of trials — that is faithful to the data, and the meta block reports bo
 bucket retains its member records so citations can be attached without a second pass.
 """
 
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 from ctgov_agent.ctgov.models import StudyRecord
@@ -66,3 +67,29 @@ def aggregate_by_country(records: list[StudyRecord]) -> list[Bucket]:
     return [
         Bucket(key=country, label=country, members=members) for country, members in grouped.items()
     ]
+
+
+@dataclass(frozen=True)
+class Reconciliation:
+    """How the buckets account for the matched trials, surfaced in meta so bar sums are explained.
+
+    ``unclassified`` trials carry no value for the grouping and land in no bucket (an undercount);
+    when ``multivalue`` is true a single trial can appear in several buckets (bar counts can then
+    exceed the trial total). Together they explain why the bar values need not sum to the trial
+    count — the fidelity gap that would otherwise be silent.
+    """
+
+    unclassified: int
+    multivalue: bool
+
+
+def reconcile(
+    records: list[StudyRecord],
+    buckets: list[Bucket],
+    values: Callable[[StudyRecord], Sequence[object]],
+) -> Reconciliation:
+    """Reconcile bucket counts against the record set. ``values`` returns a record's grouping
+    value(s) — empty when it has none — so this stays agnostic to the dimension."""
+    with_value = sum(1 for record in records if values(record))
+    bar_sum = sum(bucket.count for bucket in buckets)
+    return Reconciliation(unclassified=len(records) - with_value, multivalue=bar_sum > with_value)

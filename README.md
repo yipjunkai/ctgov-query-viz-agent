@@ -133,8 +133,9 @@ The **`visualization`** is itself discriminated on `kind`:
 **`Citation` = `{ nct_id, excerpt, field }`** — `excerpt` is the exact value from `field` that
 supports the datum, and is a verified substring of the source record.
 
-**`meta`** = `{ source, total_trials_matched, trials_aggregated, filters_applied,
-query_interpretation, units, sort, assumptions, truncated }`.
+**`meta`** = `{ source, total_trials_matched, trials_aggregated, trials_unclassified,
+filters_applied, query_interpretation, units, sort, assumptions, truncated }`. `trials_unclassified`
+and `assumptions` reconcile the bars against the trial total (see below).
 
 Example `ok` response (trimmed):
 
@@ -245,6 +246,17 @@ excerpts are terse (`"PHASE3"`, a country name, a trial title for edges) rather 
 *Why:* an unverifiable prose snippet is exactly the hallucination surface we're eliminating.
 *Production path:* character-span provenance into specific API fields, and a richer NL excerpt that is
 still span-checked.
+
+### Count reconciliation is explicit, never silent
+
+`engine/aggregate.py` (`reconcile`). Real trial records break count conservation two ways: a trial
+with no value for the grouped dimension (an observational trial has no phase) lands in **no** bucket,
+and a multi-value trial (several phases) lands in **several**. So the bars need not sum to the trial
+total. Rather than hide this, every `ok` response reports `meta.trials_unclassified` (how many trials
+fell out) and a human-readable `meta.assumptions` note ("312 of 3,736 trials report no phase and are
+excluded from the breakdown"; "a trial can report more than one phase…"). A property test ties the
+number to a conservation law. *Cost:* two extra meta fields. *Why:* the alternative — bars that
+quietly don't add up — is the kind of silent wrongness this whole design exists to prevent.
 
 ### Refusal is a first-class, typed outcome
 

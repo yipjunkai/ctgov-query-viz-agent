@@ -138,3 +138,46 @@ def test_distribution_all_null_dimension_reports_honest_no_data() -> None:
     assert body["reason"] == "no_data"
     assert "Matched 2" in body["message"]
     assert "phase" in body["message"]
+
+
+def test_distribution_meta_reconciles_dropped_trials() -> None:
+    # Two trials have a phase, one has none: the bars sum to 2 but 3 matched. Meta must own that
+    # gap (trials_unclassified + an assumption note) instead of leaving it silent.
+    plan = DistributionPlan(
+        intent="distribution",
+        dimension=CategoricalDim.phase,
+        filters=Filters(condition="melanoma"),
+    )
+    studies = [
+        {
+            "protocolSection": {
+                "identificationModule": {"nctId": "NCT1"},
+                "designModule": {"phases": ["PHASE2"]},
+            }
+        },
+        {
+            "protocolSection": {
+                "identificationModule": {"nctId": "NCT2"},
+                "designModule": {"phases": ["PHASE2"]},
+            }
+        },
+        {"protocolSection": {"identificationModule": {"nctId": "NCT3"}}},  # no phase
+    ]
+    ctgov = CtgovClient()
+    app.dependency_overrides[get_pipeline] = lambda: Pipeline(FakePlanner(plan), ctgov)
+    try:
+        with respx.mock:
+            respx.get("https://clinicaltrials.gov/api/v2/studies").mock(
+                return_value=httpx.Response(200, json={"totalCount": 3, "studies": studies})
+            )
+            resp = TestClient(app).post("/visualize", json={"query": "phase breakdown"})
+    finally:
+        app.dependency_overrides.clear()
+
+    body = resp.json()
+    assert body["status"] == "ok"
+    assert sum(p["value"] for p in body["visualization"]["data"]) == 2
+    meta = body["meta"]
+    assert meta["trials_aggregated"] == 3
+    assert meta["trials_unclassified"] == 1
+    assert any("report no phase" in note for note in meta["assumptions"])

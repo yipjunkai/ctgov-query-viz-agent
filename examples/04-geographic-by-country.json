@@ -1674,13 +1674,17 @@
       "source": "clinicaltrials.gov",
       "total_trials_matched": 3736,
       "trials_aggregated": 3736,
+      "trials_unclassified": 225,
       "filters_applied": {
         "condition": "melanoma"
       },
       "query_interpretation": "Planned by the deterministic rule-based fallback (no LLM key configured).",
       "units": "trials",
       "sort": "value desc",
-      "assumptions": [],
+      "assumptions": [
+        "225 of 3,736 trials report no country and are excluded from the map.",
+        "A trial can report more than one country; it is counted once per country, so counts can exceed the trial total."
+      ],
       "truncated": false
     }
   }
