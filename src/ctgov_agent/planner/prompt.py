@@ -8,7 +8,7 @@ the QueryPlan JSON Schema, so the allowed enum values are the API's own vocabula
 import json
 from typing import Any, cast
 
-from ctgov_agent.planner.ir import Filters, query_plan_json_schema
+from ctgov_agent.planner.ir import Filters, query_plan_tool_schema
 
 EMIT_TOOL = "emit_query_plan"
 CANNOT_ANSWER_TOOL = "cannot_answer"
@@ -72,7 +72,7 @@ def build_tools() -> list[dict[str, Any]]:
             "function": {
                 "name": EMIT_TOOL,
                 "description": "Emit the structured query plan for the question.",
-                "parameters": query_plan_json_schema(),
+                "parameters": query_plan_tool_schema(),
             },
         },
         {

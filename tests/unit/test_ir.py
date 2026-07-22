@@ -17,6 +17,7 @@ from ctgov_agent.planner.ir import (
     TimeTrendPlan,
     parse_plan,
     query_plan_json_schema,
+    query_plan_tool_schema,
 )
 
 
@@ -141,3 +142,12 @@ def test_json_schema_is_discriminated() -> None:
     schema = query_plan_json_schema()
     # The union should surface as a discriminated oneOf/anyOf so the LLM sees the intent choice.
     assert "oneOf" in schema or "anyOf" in schema
+
+
+def test_tool_schema_is_openai_compatible_object() -> None:
+    # OpenAI function `parameters` must be a type:object schema (a bare union is rejected).
+    schema = query_plan_tool_schema()
+    assert schema["type"] == "object"
+    assert "plan" in schema["properties"]
+    assert "$defs" in schema  # hoisted so $refs resolve at the root
+    assert "discriminator" not in schema  # OpenAI function-calling rejects this keyword

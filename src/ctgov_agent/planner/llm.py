@@ -8,7 +8,7 @@ unvalidated.
 
 import json
 from dataclasses import dataclass
-from typing import Any, Protocol
+from typing import Any, Protocol, cast
 
 from openai import AsyncOpenAI, omit
 from pydantic import ValidationError
@@ -28,6 +28,13 @@ from ctgov_agent.planner.prompt import (
 class ToolInvocation:
     name: str
     arguments: str
+
+
+def _unwrap_plan(payload: Any) -> Any:
+    """The emit tool wraps the plan under a "plan" key; unwrap it (tolerate an unwrapped one)."""
+    if isinstance(payload, dict) and "plan" in payload:
+        return cast("dict[str, Any]", payload)["plan"]
+    return cast("Any", payload)
 
 
 class ChatModel(Protocol):
@@ -87,7 +94,8 @@ class LLMPlanner:
                 reason, explanation = parse_cannot_answer(invocation.arguments)
                 raise PlannerError(reason, explanation)
             try:
-                return parse_plan(json.loads(invocation.arguments))
+                plan_data = _unwrap_plan(json.loads(invocation.arguments))
+                return parse_plan(plan_data)
             except (json.JSONDecodeError, ValidationError) as exc:
                 last_error = str(exc)
                 messages.append(

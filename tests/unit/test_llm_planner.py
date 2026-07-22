@@ -31,7 +31,8 @@ class FakeChatModel:
 
 
 def _emit(payload: dict[str, Any]) -> ToolInvocation:
-    return ToolInvocation(name=EMIT_TOOL, arguments=json.dumps(payload))
+    # The real emit tool wraps the plan under a "plan" key (see query_plan_tool_schema).
+    return ToolInvocation(name=EMIT_TOOL, arguments=json.dumps({"plan": payload}))
 
 
 _VALID = {"intent": "distribution", "dimension": "phase", "filters": {"condition": "melanoma"}}

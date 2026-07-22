@@ -156,5 +156,27 @@ def parse_plan(data: dict[str, Any]) -> QueryPlan:
 
 
 def query_plan_json_schema() -> dict[str, Any]:
-    """JSON Schema for the whole union — handed to the LLM as its tool's input schema."""
+    """JSON Schema for the whole union (a top-level ``oneOf``). Used to build the tool schema."""
     return _ADAPTER.json_schema()
+
+
+def query_plan_tool_schema() -> dict[str, Any]:
+    """QueryPlan wrapped as an OpenAI-compatible function-parameters object.
+
+    Function ``parameters`` must be a ``type: object`` schema, but a discriminated union is a
+    top-level ``oneOf``. We wrap the union under a ``plan`` property, hoist ``$defs`` to the root so
+    ``$ref``s still resolve, and normalize ``oneOf``→``anyOf`` (dropping the ``discriminator``
+    keyword, which OpenAI function-calling rejects). Pydantic still discriminates in ``parse_plan``.
+    """
+    union = query_plan_json_schema()
+    defs = union.pop("$defs", {})
+    union.pop("discriminator", None)
+    if "oneOf" in union:
+        union["anyOf"] = union.pop("oneOf")
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {"plan": union},
+        "required": ["plan"],
+        "$defs": defs,
+    }
