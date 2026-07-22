@@ -102,3 +102,39 @@ def test_no_matching_trials_is_refused() -> None:
     body = resp.json()
     assert body["status"] == "refused"
     assert body["reason"] == "no_data"
+
+
+def test_distribution_all_null_dimension_reports_honest_no_data() -> None:
+    # Trials matched, but none carry a phase (e.g. a purely observational set). The refusal must
+    # say so, not claim "no trials matched".
+    plan = DistributionPlan(
+        intent="distribution",
+        dimension=CategoricalDim.phase,
+        filters=Filters(condition="observational-only"),
+    )
+    studies = [
+        {
+            "protocolSection": {
+                "identificationModule": {"nctId": f"NCT{i}", "briefTitle": "obs"},
+                "statusModule": {"overallStatus": "RECRUITING"},
+            }
+        }
+        for i in range(2)
+    ]
+    ctgov = CtgovClient()
+    app.dependency_overrides[get_pipeline] = lambda: Pipeline(FakePlanner(plan), ctgov)
+    try:
+        with respx.mock:
+            respx.get("https://clinicaltrials.gov/api/v2/studies").mock(
+                return_value=httpx.Response(200, json={"totalCount": 2, "studies": studies})
+            )
+            resp = TestClient(app).post("/visualize", json={"query": "phase breakdown"})
+    finally:
+        app.dependency_overrides.clear()
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["status"] == "refused"
+    assert body["reason"] == "no_data"
+    assert "Matched 2" in body["message"]
+    assert "phase" in body["message"]
