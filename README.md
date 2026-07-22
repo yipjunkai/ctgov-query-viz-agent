@@ -359,3 +359,7 @@ src/ctgov_agent/
 tests/           # unit · integration · property · e2e   (single gate: just verify)
 examples/        # 3–5 golden request→response runs
 ```
+
+## License
+
+MIT — see [`LICENSE`](LICENSE).
