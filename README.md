@@ -157,8 +157,9 @@ Example `ok` response (trimmed):
 }
 ```
 
-Five full request → response examples are in **[`examples/`](examples/)**, regenerable with
-`just examples` (needs network).
+Six full request → response examples are in **[`examples/`](examples/)**; the five deterministic ones
+regenerate with `just examples` (the comparison example needs an LLM key, since only the LLM planner
+splits a comparison into series).
 
 ## Query & visualization coverage
 
