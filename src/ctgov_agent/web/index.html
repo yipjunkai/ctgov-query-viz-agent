@@ -4,98 +4,357 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ClinicalTrials.gov Query-to-Visualization Agent</title>
+  <!-- Set theme before first paint to avoid a flash. -->
+  <script>
+    (function () {
+      try {
+        var m = localStorage.getItem("ctgov-theme") ||
+          (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", m);
+      } catch (e) { document.documentElement.setAttribute("data-theme", "light"); }
+    })();
+  </script>
   <!-- vega-embed bundles Vega + Vega-Lite. Loaded from a CDN, so this page needs internet for the
        rendering libs; the API and its data path do not. -->
   <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
   <style>
-    :root { --bg:#f7f8fa; --card:#fff; --line:#e6e8eb; --ink:#1c2530; --muted:#6b7684; --accent:#2f6feb; }
+    :root[data-theme="light"] {
+      --bg: #f3f5f9; --bg-grad: radial-gradient(1200px 600px at 80% -10%, #e9f3f6 0%, rgba(233,243,246,0) 60%);
+      --surface: #ffffff; --surface-2: #f8fafc; --surface-3: #f1f5f9;
+      --border: #e5e9f0; --border-2: #d7dee8;
+      --ink: #0f1b26; --ink-2: #3f4c5a; --muted: #697585; --faint: #9aa5b1;
+      --accent: #0e7490; --accent-2: #0b5f77; --accent-ink: #ffffff;
+      --accent-soft: #e2f2f6; --accent-border: #b7dde6;
+      --ok: #0f9d6e; --ok-soft: #e4f6ef;
+      --warn: #b45309; --warn-soft: #fdf1e1; --warn-border: #f2d9b0;
+      --info: #1d4ed8; --info-soft: #e8effd; --info-border: #c6d6f8;
+      --danger: #c23b32; --danger-soft: #fcecea; --danger-border: #f4cdc8;
+      --shadow: 0 1px 2px rgba(16,27,38,.04), 0 8px 24px -12px rgba(16,27,38,.14);
+      --shadow-sm: 0 1px 2px rgba(16,27,38,.06);
+      --ring: rgba(14,116,144,.35);
+    }
+    :root[data-theme="dark"] {
+      --bg: #0b0f14; --bg-grad: radial-gradient(1100px 600px at 82% -12%, #10262c 0%, rgba(16,38,44,0) 62%);
+      --surface: #141a21; --surface-2: #182029; --surface-3: #1f2831;
+      --border: #262f3a; --border-2: #323d49;
+      --ink: #e7edf3; --ink-2: #b9c4cf; --muted: #8a96a3; --faint: #626e7b;
+      --accent: #2bb8ce; --accent-2: #4fc9db; --accent-ink: #04141a;
+      --accent-soft: #102b33; --accent-border: #1e4954;
+      --ok: #34d399; --ok-soft: #10291f;
+      --warn: #f5b169; --warn-soft: #2c2113; --warn-border: #4a3a1e;
+      --info: #7aa2f7; --info-soft: #172035; --info-border: #2a3a5c;
+      --danger: #f2857b; --danger-soft: #2a1715; --danger-border: #4d2925;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 30px -14px rgba(0,0,0,.6);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.35);
+      --ring: rgba(43,184,206,.4);
+    }
     * { box-sizing: border-box; }
-    body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-           background:var(--bg); color:var(--ink); line-height:1.5; }
-    .wrap { max-width: 920px; margin: 0 auto; padding: 28px 20px 64px; }
-    header h1 { font-size: 20px; margin:0 0 4px; }
-    header p { color:var(--muted); margin:0 0 20px; font-size:14px; }
-    .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px; margin-bottom:18px; }
-    form { display:grid; gap:10px; }
-    .q-row { display:flex; gap:8px; }
-    input[type=text] { width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; font-size:14px; }
-    .fields { display:grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap:8px; }
-    .fields input { font-size:13px; padding:8px 10px; }
-    button { background:var(--accent); color:#fff; border:0; border-radius:8px; padding:10px 18px;
-             font-size:14px; font-weight:600; cursor:pointer; }
-    button:disabled { opacity:.6; cursor:default; }
-    .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
-    .chip { background:#eef2f8; color:var(--accent); border:1px solid #dbe6fb; border-radius:999px;
-            padding:6px 12px; font-size:12.5px; cursor:pointer; }
-    label.small { font-size:11px; color:var(--muted); display:block; margin:0 0 2px 2px; }
-    #vis { width:100%; min-height:40px; }
-    .meta { display:grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap:12px; font-size:13px; }
-    .meta .k { color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.03em; }
-    .meta .v { font-weight:600; }
-    table { width:100%; border-collapse:collapse; font-size:12.5px; }
-    th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
-    th { color:var(--muted); font-weight:600; }
-    td.excerpt { color:var(--ink); }
-    a { color:var(--accent); text-decoration:none; }
-    .banner { border-radius:10px; padding:14px 16px; font-size:14px; }
-    .banner.refused { background:#fdf0ef; border:1px solid #f6d4d1; color:#a12b22; }
-    .banner.clarify { background:#fff8e6; border:1px solid #f2e0a8; color:#8a6d1a; }
-    .banner.error { background:#fdf0ef; border:1px solid #f6d4d1; color:#a12b22; }
-    .status { color:var(--muted); font-size:13px; }
-    h2.section { font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin:0 0 12px; }
-    details summary { cursor:pointer; color:var(--muted); font-size:12.5px; }
-    pre { background:#0f1722; color:#d6e2f0; padding:12px; border-radius:8px; overflow:auto; font-size:12px; }
-    .hidden { display:none; }
-    .code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); background-image: var(--bg-grad); background-attachment: fixed;
+      color: var(--ink); line-height: 1.55;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-feature-settings: "cv02","cv03","cv04","cv11"; -webkit-font-smoothing: antialiased;
+    }
+    .mono { font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; border-radius: 6px; }
+
+    /* ---------- top bar ---------- */
+    .topbar {
+      position: sticky; top: 0; z-index: 20; backdrop-filter: saturate(1.4) blur(8px);
+      background: color-mix(in srgb, var(--surface) 78%, transparent);
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar-in { max-width: 1080px; margin: 0 auto; padding: 12px 22px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
+    .logo { width: 34px; height: 34px; border-radius: 9px; flex: none;
+      background: linear-gradient(150deg, var(--accent) 0%, var(--accent-2) 100%);
+      display: grid; place-items: center; box-shadow: var(--shadow-sm); }
+    .brand-text { min-width: 0; }
+    .brand-name { font-size: 14.5px; font-weight: 650; letter-spacing: -.01em; white-space: nowrap; }
+    .brand-sub { font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+    .pill-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-2);
+      padding: 7px 11px; border: 1px solid var(--border-2); border-radius: 8px; background: var(--surface); }
+    .pill-link:hover { text-decoration: none; border-color: var(--accent-border); color: var(--ink); }
+    .icon-btn { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 8px;
+      border: 1px solid var(--border-2); background: var(--surface); color: var(--ink-2); cursor: pointer; transition: .15s; }
+    .icon-btn:hover { color: var(--ink); border-color: var(--accent-border); }
+    .icon-btn .moon { display: none; } :root[data-theme="dark"] .icon-btn .sun { display: none; }
+    :root[data-theme="dark"] .icon-btn .moon { display: block; }
+
+    /* ---------- layout ---------- */
+    main { max-width: 1080px; margin: 0 auto; padding: 40px 22px 40px; }
+    .hero { margin-bottom: 26px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600;
+      color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-border);
+      padding: 5px 11px; border-radius: 999px; margin-bottom: 16px; }
+    .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+    h1 { font-size: clamp(26px, 4.4vw, 38px); line-height: 1.1; letter-spacing: -.025em; margin: 0 0 12px; font-weight: 680; }
+    h1 .grad { background: linear-gradient(100deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .lede { color: var(--ink-2); font-size: 15.5px; max-width: 62ch; margin: 0; }
+    .pipeline { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+    .step { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted);
+      padding: 5px 10px 5px 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+    .step b { color: var(--ink-2); font-weight: 600; }
+    .step .n { width: 17px; height: 17px; border-radius: 5px; display: grid; place-items: center; font-size: 10.5px;
+      font-weight: 700; color: var(--accent); background: var(--accent-soft); }
+    .step .arrow { color: var(--faint); }
+
+    /* ---------- search ---------- */
+    .search { margin-top: 24px; }
+    .search-bar { display: flex; align-items: center; gap: 8px; background: var(--surface);
+      border: 1px solid var(--border-2); border-radius: 14px; padding: 8px 8px 8px 14px; box-shadow: var(--shadow);
+      transition: border-color .15s, box-shadow .15s; }
+    .search-bar:focus-within { border-color: var(--accent); box-shadow: var(--shadow), 0 0 0 4px var(--ring); }
+    .search-bar svg.q { color: var(--muted); flex: none; }
+    #query { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font-size: 16px; padding: 8px 4px; }
+    #query::placeholder { color: var(--faint); }
+    #query:focus { outline: none; }
+    .btn { border: 0; cursor: pointer; font-weight: 600; border-radius: 10px; transition: .15s; font-size: 14px; }
+    .btn-primary { background: var(--accent); color: var(--accent-ink); padding: 11px 20px; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-primary:hover { background: var(--accent-2); }
+    .btn-primary:disabled { opacity: .55; cursor: default; }
+
+    .filters { margin-top: 12px; }
+    .filters summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
+      font-size: 12.5px; color: var(--muted); padding: 4px 2px; user-select: none; }
+    .filters summary::-webkit-details-marker { display: none; }
+    .filters summary .chev { transition: transform .2s; }
+    .filters[open] summary .chev { transform: rotate(90deg); }
+    .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 12px; }
+    .field label { display: block; font-size: 11px; letter-spacing: .02em; color: var(--muted); margin: 0 0 5px 2px; text-transform: uppercase; }
+    .field input { width: 100%; padding: 9px 11px; border: 1px solid var(--border-2); border-radius: 9px;
+      background: var(--surface); color: var(--ink); font-size: 13.5px; transition: .15s; }
+    .field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--ring); }
+    .field input::placeholder { color: var(--faint); }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; align-items: center; }
+    .chips-label { font-size: 12px; color: var(--muted); margin-right: 2px; }
+    .chip { background: var(--surface); color: var(--ink-2); border: 1px solid var(--border-2); border-radius: 999px;
+      padding: 6px 13px; font-size: 12.5px; cursor: pointer; transition: .15s; }
+    .chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+    /* ---------- panels ---------- */
+    .results { margin-top: 30px; display: grid; gap: 16px; }
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
+    .panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 18px 20px; border-bottom: 1px solid var(--border); }
+    .panel-head h2, .panel-head h3 { margin: 0; }
+    .panel-title { font-size: 16.5px; font-weight: 640; letter-spacing: -.01em; }
+    .panel-body { padding: 18px 20px; }
+    .section-h { display: flex; align-items: center; gap: 10px; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+    .section-h h3 { margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 650; }
+    .viz-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; color: var(--accent);
+      background: var(--accent-soft); border: 1px solid var(--accent-border); border-radius: 7px; padding: 4px 9px; white-space: nowrap; }
+    #vis { width: 100%; min-height: 40px; padding: 16px 14px 6px; }
+    .anim { animation: rise .4s cubic-bezier(.2,.7,.2,1) both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    details.spec { border-top: 1px solid var(--border); }
+    details.spec summary { list-style: none; cursor: pointer; padding: 12px 20px; font-size: 12.5px; color: var(--muted);
+      display: flex; align-items: center; gap: 8px; }
+    details.spec summary::-webkit-details-marker { display: none; }
+    details.spec summary .chev { transition: transform .2s; } details.spec[open] summary .chev { transform: rotate(90deg); }
+    pre { margin: 0; background: var(--surface-3); color: var(--ink-2); padding: 16px 20px; overflow: auto; font-size: 12px; line-height: 1.6; max-height: 340px; }
+
+    /* ---------- stat grid ---------- */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--border); }
+    .stat { background: var(--surface); padding: 16px 18px; }
+    .stat .k { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin-bottom: 5px; }
+    .stat .v { font-size: 20px; font-weight: 650; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+    .stat .v.sm { font-size: 14px; font-weight: 600; }
+    .badge-yn { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; }
+    .badge-yn .d { width: 7px; height: 7px; border-radius: 50%; }
+    .meta-extra { padding: 16px 20px; border-top: 1px solid var(--border); display: grid; gap: 14px; }
+    .kv-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+    .kv-label { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin-right: 4px; align-self: center; }
+    .tag { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; background: var(--surface-3);
+      border: 1px solid var(--border-2); border-radius: 7px; padding: 4px 9px; }
+    .tag b { color: var(--ink); font-weight: 600; } .tag span { color: var(--muted); }
+    .interp { font-size: 13.5px; color: var(--ink-2); background: var(--surface-2); border-left: 3px solid var(--accent-border);
+      border-radius: 0 8px 8px 0; padding: 11px 14px; }
+    .interp .lbl { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin-bottom: 4px; }
+
+    /* ---------- citations ---------- */
+    .verified { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; color: var(--ok);
+      background: var(--ok-soft); border-radius: 999px; padding: 4px 10px; }
+    .cite-note { font-size: 12px; color: var(--muted); }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th { position: sticky; top: 0; text-align: left; padding: 11px 20px; font-size: 11px; text-transform: uppercase;
+      letter-spacing: .04em; color: var(--muted); font-weight: 650; background: var(--surface-2); border-bottom: 1px solid var(--border); white-space: nowrap; }
+    tbody td { padding: 11px 20px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr:hover td { background: var(--surface-2); }
+    td.ctx { color: var(--ink-2); white-space: nowrap; }
+    td.excerpt { color: var(--ink); max-width: 40ch; }
+    td .nct { font-weight: 600; }
+    td .field-tag { font-size: 11.5px; color: var(--muted); }
+
+    /* ---------- states ---------- */
+    .empty { text-align: center; padding: 54px 24px; border: 1px dashed var(--border-2); border-radius: 16px; background: var(--surface); }
+    .empty .glyph { width: 52px; height: 52px; border-radius: 14px; margin: 0 auto 16px; display: grid; place-items: center;
+      color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-border); }
+    .empty h3 { margin: 0 0 6px; font-size: 16px; font-weight: 640; }
+    .empty p { margin: 0; color: var(--muted); font-size: 13.5px; }
+
+    .loading { display: flex; align-items: center; gap: 14px; padding: 22px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); }
+    .spinner { width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid var(--border-2); border-top-color: var(--accent); animation: spin .7s linear infinite; flex: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading .lt { font-size: 14px; font-weight: 600; }
+    .loading .ls { font-size: 12.5px; color: var(--muted); }
+
+    .banner { border-radius: 16px; padding: 18px 20px; display: flex; gap: 14px; align-items: flex-start; box-shadow: var(--shadow-sm); }
+    .banner .bi { width: 34px; height: 34px; border-radius: 9px; flex: none; display: grid; place-items: center; }
+    .banner .bt { font-size: 14.5px; font-weight: 650; margin-bottom: 3px; }
+    .banner .bm { font-size: 13.5px; line-height: 1.5; }
+    .banner .bcode { font-size: 11.5px; margin-top: 8px; }
+    .banner.warn { background: var(--warn-soft); border: 1px solid var(--warn-border); }
+    .banner.warn .bi { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); }
+    .banner.warn .bt { color: var(--warn); }
+    .banner.info { background: var(--info-soft); border: 1px solid var(--info-border); }
+    .banner.info .bi { background: color-mix(in srgb, var(--info) 16%, transparent); color: var(--info); }
+    .banner.info .bt { color: var(--info); }
+    .banner.danger { background: var(--danger-soft); border: 1px solid var(--danger-border); }
+    .banner.danger .bi { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
+    .banner.danger .bt { color: var(--danger); }
+    .banner .bm .rc { font-family: ui-monospace, monospace; background: color-mix(in srgb, var(--ink) 8%, transparent); padding: 1px 6px; border-radius: 5px; }
+
+    footer { max-width: 1080px; margin: 0 auto; padding: 20px 22px 44px; color: var(--muted); font-size: 12.5px; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+    footer .sep { color: var(--faint); }
+    .hidden { display: none !important; }
+
+    @media (max-width: 640px) {
+      main { padding: 28px 16px; } .topbar-in { padding: 11px 16px; }
+      .brand-sub { display: none; } .pill-link .lbl { display: none; }
+      .btn-primary { padding: 11px 15px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; } }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>ClinicalTrials.gov Query-to-Visualization Agent</h1>
-      <p>Ask a question about clinical trials — the agent plans it, fetches real data, and returns a
-         visualization spec. The LLM never emits a number; every value is computed from records.</p>
-    </header>
-
-    <div class="card">
-      <form id="form">
-        <div class="q-row">
-          <input type="text" id="query" placeholder="e.g. How are melanoma trials distributed across phases?" required />
-          <button type="submit" id="go">Visualize</button>
+  <div class="topbar">
+    <div class="topbar-in">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="13" width="4" height="8" rx="1.3" fill="#fff" opacity=".9"/>
+            <rect x="10" y="8" width="4" height="13" rx="1.3" fill="#fff"/>
+            <rect x="17" y="4" width="4" height="17" rx="1.3" fill="#fff" opacity=".75"/>
+          </svg>
+        </span>
+        <div class="brand-text">
+          <div class="brand-name">ClinicalTrials Visualization Agent</div>
+          <div class="brand-sub">Natural-language questions &rarr; verifiable, source-cited charts</div>
         </div>
-        <div class="fields">
-          <div><label class="small">condition</label><input type="text" id="condition" placeholder="melanoma" /></div>
-          <div><label class="small">drug_name</label><input type="text" id="drug_name" placeholder="Pembrolizumab" /></div>
-          <div><label class="small">country</label><input type="text" id="country" /></div>
-          <div><label class="small">start_year</label><input type="text" id="start_year" inputmode="numeric" /></div>
-          <div><label class="small">end_year</label><input type="text" id="end_year" inputmode="numeric" /></div>
-        </div>
-        <div class="chips" id="chips"></div>
-      </form>
-    </div>
-
-    <div id="statusCard" class="card hidden"><span class="status" id="status"></span></div>
-    <div id="bannerCard" class="card hidden"><div id="banner" class="banner"></div></div>
-
-    <div id="resultCard" class="card hidden">
-      <div id="vis"></div>
-      <details style="margin-top:10px"><summary>View generated Vega / Vega-Lite spec</summary>
-        <pre id="specDump" class="code"></pre></details>
-    </div>
-
-    <div id="metaCard" class="card hidden">
-      <h2 class="section">Response metadata</h2>
-      <div class="meta" id="meta"></div>
-    </div>
-
-    <div id="citeCard" class="card hidden">
-      <h2 class="section">Deep citations <span id="citeNote" style="text-transform:none;font-weight:400"></span></h2>
-      <table><thead><tr><th>Datum</th><th>Trial</th><th>Excerpt</th><th>Field</th></tr></thead>
-        <tbody id="citeBody"></tbody></table>
+      </div>
+      <div class="topbar-actions">
+        <a class="pill-link" href="https://clinicaltrials.gov/data-api/api" target="_blank" rel="noopener">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M8 7h9v9"/></svg>
+          <span class="lbl">Data&nbsp;API</span>
+        </a>
+        <button class="icon-btn" id="themeToggle" title="Toggle theme" aria-label="Toggle color theme">
+          <svg class="sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M19.4 4.6l-1.8 1.8M6.4 17.6l-1.8 1.8"/></svg>
+          <svg class="moon" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 14.3A8.5 8.5 0 0 1 9.7 3.5a.7.7 0 0 0-.9-.9 9.8 9.8 0 1 0 12.6 12.6.7.7 0 0 0-.9-.9Z"/></svg>
+        </button>
+      </div>
     </div>
   </div>
+
+  <main>
+    <section class="hero">
+      <span class="eyebrow"><span class="dot"></span> Live ClinicalTrials.gov &middot; v2 API</span>
+      <h1>Ask a question about<br><span class="grad">clinical trials.</span></h1>
+      <p class="lede">The agent plans your question into a validated query, fetches real records, and computes
+        every count in code &mdash; <b>the model never emits a number</b>. Each datum links back to the trials that produced it.</p>
+      <div class="pipeline" aria-hidden="true">
+        <span class="step"><span class="n">1</span> <b>Plan</b></span><span class="step arrow">&rarr;</span>
+        <span class="step"><span class="n">2</span> <b>Fetch</b></span><span class="step arrow">&rarr;</span>
+        <span class="step"><span class="n">3</span> <b>Aggregate</b></span><span class="step arrow">&rarr;</span>
+        <span class="step"><span class="n">4</span> <b>Cite</b></span>
+      </div>
+
+      <form class="search" id="form">
+        <div class="search-bar">
+          <svg class="q" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+          <input type="text" id="query" autocomplete="off" placeholder="How are melanoma trials distributed across phases?" required />
+          <button type="submit" class="btn btn-primary" id="go">
+            <span>Visualize</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+        <details class="filters">
+          <summary><svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg> Optional filters &mdash; these deterministically override the planner</summary>
+          <div class="fields">
+            <div class="field"><label>Condition</label><input type="text" id="condition" placeholder="melanoma" /></div>
+            <div class="field"><label>Drug name</label><input type="text" id="drug_name" placeholder="Pembrolizumab" /></div>
+            <div class="field"><label>Country</label><input type="text" id="country" placeholder="United States" /></div>
+            <div class="field"><label>Start year</label><input type="text" id="start_year" inputmode="numeric" placeholder="2015" /></div>
+            <div class="field"><label>End year</label><input type="text" id="end_year" inputmode="numeric" placeholder="2025" /></div>
+          </div>
+        </details>
+        <div class="chips" id="chips"><span class="chips-label">Try:</span></div>
+      </form>
+    </section>
+
+    <section class="results" id="results">
+      <div id="emptyState" class="empty">
+        <div class="glyph" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l3.5-4 3 2.5L20 8"/></svg>
+        </div>
+        <h3>Your visualization will appear here</h3>
+        <p>Pick an example above, or ask about phases, trends over time, geography, comparisons, or sponsor&ndash;drug networks.</p>
+      </div>
+
+      <div id="loading" class="loading hidden">
+        <span class="spinner" aria-hidden="true"></span>
+        <div><div class="lt">Working&hellip;</div><div class="ls" id="loadingSub">Planning the query and fetching records from ClinicalTrials.gov</div></div>
+      </div>
+
+      <div id="bannerCard" class="hidden"><div id="banner" class="banner"></div></div>
+
+      <article id="resultCard" class="panel hidden">
+        <div class="panel-head">
+          <div><div class="panel-title" id="vizTitle"></div></div>
+          <span class="viz-badge" id="vizBadge"></span>
+        </div>
+        <div id="vis"></div>
+        <details class="spec">
+          <summary><svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg> View generated Vega&nbsp;/&nbsp;Vega-Lite spec</summary>
+          <pre id="specDump" class="mono"></pre>
+        </details>
+      </article>
+
+      <section id="metaCard" class="panel hidden">
+        <div class="section-h"><h3>Response metadata</h3></div>
+        <div class="stat-grid" id="meta"></div>
+        <div class="meta-extra" id="metaExtra"></div>
+      </section>
+
+      <section id="citeCard" class="panel hidden">
+        <div class="section-h">
+          <h3>Deep citations</h3>
+          <span class="verified"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> verified</span>
+          <span class="cite-note" id="citeNote"></span>
+        </div>
+        <div class="table-scroll">
+          <table><thead><tr><th>Datum</th><th>Trial</th><th>Excerpt</th><th>Field</th></tr></thead>
+            <tbody id="citeBody"></tbody></table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer>
+    <span>Backend owns all logic; this page is a pure consumer of the <span class="mono">/visualize</span> contract.</span>
+    <span class="sep">&bull;</span>
+    <span>Charts by Vega-Lite, network by Vega force layout.</span>
+  </footer>
 
 <script>
 const EXAMPLES = [
@@ -105,24 +364,40 @@ const EXAMPLES = [
   ["Sponsor ↔ drug network", {query:"Show a network of sponsors and drugs for melanoma trials", condition:"melanoma"}],
   ["Pembrolizumab by status", {query:"Break down pembrolizumab trials by recruitment status", drug_name:"Pembrolizumab"}],
 ];
+const VIZ_LABEL = { bar_chart:"Bar chart", histogram:"Histogram", time_series:"Time series", grouped_bar:"Grouped bars", choropleth:"By country", network_graph:"Network graph" };
 
 const $ = (id) => document.getElementById(id);
-
 function show(id, on) { $(id).classList.toggle("hidden", !on); }
+let lastBody = null;
 
-const chips = $("chips");
+/* ---- theme ---- */
+function theme() {
+  const dark = document.documentElement.getAttribute("data-theme") === "dark";
+  return dark
+    ? { ink:"#e7edf3", muted:"#8a96a3", grid:"#232b35", mark:"#2bb8ce", link:"#39424e", nodeStroke:"#141a21",
+        series:["#2bb8ce","#8b9cff","#f5b169","#f2857b","#5fd6a3","#c39bf0"] }
+    : { ink:"#0f1b26", muted:"#697585", grid:"#eef1f6", mark:"#0e7490", link:"#cbd5df", nodeStroke:"#ffffff",
+        series:["#0e7490","#4f46e5","#d97706","#dc2626","#059669","#7c3aed"] };
+}
+$("themeToggle").onclick = () => {
+  const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem("ctgov-theme", next); } catch (e) {}
+  if (lastBody && lastBody.status === "ok") drawViz(lastBody.visualization); // re-theme the chart
+};
+
+/* ---- example chips ---- */
 for (const [label, req] of EXAMPLES) {
   const b = document.createElement("span");
   b.className = "chip"; b.textContent = label;
   b.onclick = () => { fillForm(req); submit(req); };
-  chips.appendChild(b);
+  $("chips").appendChild(b);
 }
 
 function fillForm(req) {
   $("query").value = req.query || "";
   for (const k of ["condition","drug_name","country","start_year","end_year"]) $(k).value = req[k] ?? "";
 }
-
 function readForm() {
   const req = { query: $("query").value.trim() };
   for (const k of ["condition","drug_name","country"]) { const v = $(k).value.trim(); if (v) req[k] = v; }
@@ -135,84 +410,115 @@ $("form").addEventListener("submit", (e) => { e.preventDefault(); submit(readFor
 async function submit(req) {
   if (!req.query) return;
   $("go").disabled = true;
+  show("emptyState", false);
   for (const c of ["bannerCard","resultCard","metaCard","citeCard"]) show(c, false);
-  show("statusCard", true); $("status").textContent = "Querying ClinicalTrials.gov…";
+  show("loading", true);
   try {
     const resp = await fetch("/visualize", {
       method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify(req),
     });
     render(await resp.json());
   } catch (err) {
-    banner("error", "Request failed", String(err));
+    banner("danger", "Request failed", String(err));
   } finally {
-    show("statusCard", false); $("go").disabled = false;
+    show("loading", false); $("go").disabled = false;
   }
 }
 
-function banner(kind, title, msg) {
+function banner(kind, title, msg, code) {
+  const icons = {
+    warn: '<path d="M12 9v4M12 17h.01M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6A2 2 0 0 0 22 18L13.7 3.9a2 2 0 0 0-3.4 0Z"/>',
+    info: '<circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/>',
+    danger: '<circle cx="12" cy="12" r="9"/><path d="m15 9-6 6M9 9l6 6"/>',
+  };
   show("bannerCard", true);
-  const el = $("banner"); el.className = "banner " + kind;
-  el.innerHTML = "<strong>" + title + "</strong><br>" + msg;
+  const el = $("banner"); el.className = "banner anim " + kind;
+  el.innerHTML =
+    '<span class="bi"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + icons[kind] + '</svg></span>' +
+    '<div><div class="bt">' + title + '</div><div class="bm">' + msg + (code ? '<div class="bcode">' + code + '</div>' : '') + '</div></div>';
 }
 
 function render(body) {
-  if (body.status === "refused") { banner("refused", "Cannot process (" + body.reason + ")", body.message); return; }
-  if (body.status === "needs_clarification") { banner("clarify", "Needs clarification", body.question); return; }
+  lastBody = body;
+  if (body.status === "refused") {
+    const reasons = {
+      too_broad: "Too broad to aggregate exactly", out_of_domain: "Outside the clinical-trials domain",
+      no_data: "No matching trials", unsupported: "Not expressible as a supported query", upstream_error: "Upstream API error",
+      planner_unavailable: "Planner unavailable",
+    };
+    const title = reasons[body.reason] || "Cannot process this query";
+    banner("warn", title, escapeHtml(body.message), 'refusal reason: <span class="rc">' + body.reason + "</span>");
+    return;
+  }
+  if (body.status === "needs_clarification") { banner("info", "One clarification needed", escapeHtml(body.question)); return; }
   const viz = body.visualization;
-  const spec = viz.kind === "network" ? networkSpec(viz) : chartSpec(viz);
+  $("vizTitle").textContent = viz.title;
+  $("vizBadge").textContent = VIZ_LABEL[viz.type] || viz.type;
   show("resultCard", true);
-  vegaEmbed("#vis", spec, {actions: false, renderer: "canvas"}).catch((e) => banner("error", "Render failed", String(e)));
-  $("specDump").textContent = JSON.stringify(spec, null, 2);
+  $("resultCard").classList.add("anim");
+  drawViz(viz);
   showMeta(body.meta);
   showCitations(viz);
 }
 
+function drawViz(viz) {
+  const spec = viz.kind === "network" ? networkSpec(viz) : chartSpec(viz);
+  vegaEmbed("#vis", spec, {actions: false, renderer: "canvas"}).catch((e) => banner("danger", "Render failed", String(e)));
+  $("specDump").textContent = JSON.stringify(spec, null, 2);
+}
+
 function chartSpec(viz) {
+  const t = theme();
   const base = {
     "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-    title: viz.title, data: {values: viz.data}, width: "container", height: 380,
-    config: {axis: {labelFontSize: 11, titleFontSize: 12}, view: {stroke: null}},
+    background: "transparent", data: {values: viz.data}, width: "container", height: 360,
+    config: {
+      font: "ui-sans-serif, system-ui, sans-serif",
+      axis: {labelFontSize: 11, titleFontSize: 12, labelColor: t.muted, titleColor: t.muted,
+             gridColor: t.grid, domainColor: t.grid, tickColor: t.grid, titleFontWeight: 600, titlePadding: 8},
+      legend: {labelColor: t.ink, titleColor: t.muted, labelFontSize: 11, titleFontSize: 11},
+      view: {stroke: null},
+    },
   };
   const xt = viz.encoding?.x?.label || "", yt = viz.encoding?.y?.label || "Trial count";
   if (viz.type === "time_series") return {...base,
-    mark: {type: "line", point: true, tooltip: true, interpolate: "monotone"},
-    encoding: {x: {field: "key", type: "ordinal", sort: null, axis: {title: xt || "Start year"}},
+    mark: {type: "line", point: {filled: true, size: 46, color: t.mark}, tooltip: true, interpolate: "monotone", color: t.mark, strokeWidth: 2.5},
+    encoding: {x: {field: "key", type: "ordinal", sort: null, axis: {title: xt || "Start year", grid: false}},
                y: {field: "value", type: "quantitative", axis: {title: yt}}}};
-  if (viz.type === "grouped_bar") return {...base, mark: {type: "bar", tooltip: true},
-    encoding: {x: {field: "label", type: "nominal", sort: null, axis: {title: xt, labelAngle: -30}},
+  if (viz.type === "grouped_bar") return {...base, mark: {type: "bar", tooltip: true, cornerRadiusEnd: 3},
+    encoding: {x: {field: "label", type: "nominal", sort: null, axis: {title: xt, labelAngle: -25, grid: false}},
                xOffset: {field: "series"},
                y: {field: "value", type: "quantitative", axis: {title: yt}},
-               color: {field: "series", type: "nominal", legend: {title: "Series"}}}};
-  if (viz.type === "choropleth") return {...base, mark: {type: "bar", tooltip: true},
-    encoding: {y: {field: "label", type: "nominal", sort: null, axis: {title: xt || "Country"}},
+               color: {field: "series", type: "nominal", legend: {title: null, orient: "top"}, scale: {range: t.series}}}};
+  if (viz.type === "choropleth") return {...base, height: Math.max(240, viz.data.length * 26), mark: {type: "bar", tooltip: true, cornerRadiusEnd: 3, color: t.mark},
+    encoding: {y: {field: "label", type: "nominal", sort: "-x", axis: {title: null, grid: false}},
                x: {field: "value", type: "quantitative", axis: {title: yt}}}};
-  return {...base, mark: {type: "bar", tooltip: true},
-    encoding: {x: {field: "label", type: "nominal", sort: null, axis: {title: xt, labelAngle: -30}},
-               y: {field: "value", type: "quantitative", axis: {title: yt}},
-               color: {value: "#2f6feb"}}};
+  return {...base, mark: {type: "bar", tooltip: true, cornerRadiusEnd: 3, color: t.mark},
+    encoding: {x: {field: "label", type: "nominal", sort: null, axis: {title: xt, labelAngle: -25, grid: false}},
+               y: {field: "value", type: "quantitative", axis: {title: yt}}}};
 }
 
 function networkSpec(viz) {
+  const t = theme();
   const idx = {}; viz.nodes.forEach((n, i) => idx[n.id] = i);
   const nodes = viz.nodes.map((n) => ({name: n.label, kind: n.kind, value: n.value}));
   const links = viz.edges.map((e) => ({source: idx[e.source], target: idx[e.target], weight: e.weight}));
   return {
     "$schema": "https://vega.github.io/schema/vega/v5.json",
-    width: 860, height: 520, padding: 0, autosize: "none",
-    title: viz.title,
+    width: 860, height: 520, padding: 0, autosize: "none", background: "transparent",
     signals: [{name: "cx", update: "width/2"}, {name: "cy", update: "height/2"}],
     data: [{name: "node-data", values: nodes}, {name: "link-data", values: links}],
     scales: [
-      {name: "color", type: "ordinal", domain: {data: "node-data", field: "kind"}, range: {scheme: "tableau10"}},
-      {name: "size", type: "sqrt", domain: {data: "node-data", field: "value"}, range: [80, 900]},
+      {name: "color", type: "ordinal", domain: {data: "node-data", field: "kind"}, range: t.series},
+      {name: "size", type: "sqrt", domain: {data: "node-data", field: "value"}, range: [90, 950]},
       {name: "width", type: "linear", domain: {data: "link-data", field: "weight"}, range: [1, 7]},
     ],
-    legends: [{fill: "color", title: "Entity type", orient: "top-left"}],
+    legends: [{fill: "color", title: "Entity type", orient: "top-left", labelColor: t.ink, titleColor: t.muted, labelFontSize: 11, titleFontSize: 11}],
     marks: [
       {
         name: "nodes", type: "symbol", zindex: 1, from: {data: "node-data"},
         encode: {
-          enter: {fill: {scale: "color", field: "kind"}, stroke: {value: "#fff"}, strokeWidth: {value: 1},
+          enter: {fill: {scale: "color", field: "kind"}, stroke: {value: t.nodeStroke}, strokeWidth: {value: 1.5},
                   tooltip: {signal: "datum.name + '  —  ' + datum.kind + ' · ' + datum.value + ' trials'"}},
           update: {size: {scale: "size", field: "value"}, cursor: {value: "pointer"}},
         },
@@ -228,8 +534,8 @@ function networkSpec(viz) {
       },
       {
         type: "path", from: {data: "link-data"}, interactive: false, zindex: 0,
-        encode: {update: {stroke: {value: "#c3ccd6"}, strokeWidth: {scale: "width", field: "weight"},
-                          strokeOpacity: {value: 0.7},
+        encode: {update: {stroke: {value: t.link}, strokeWidth: {scale: "width", field: "weight"},
+                          strokeOpacity: {value: 0.75},
                           tooltip: {signal: "'shared trials: ' + datum.weight"}}},
         transform: [{type: "linkpath", require: {signal: "force"}, shape: "line",
                      sourceX: "datum.source.x", sourceY: "datum.source.y",
@@ -241,15 +547,41 @@ function networkSpec(viz) {
 
 function showMeta(m) {
   show("metaCard", true);
-  const cell = (k, v) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`;
-  const filters = JSON.stringify(m.filters_applied || {});
+  const yn = (v) => v
+    ? '<span class="badge-yn" style="color:var(--warn)"><span class="d" style="background:var(--warn)"></span>Yes</span>'
+    : '<span class="badge-yn" style="color:var(--ok)"><span class="d" style="background:var(--ok)"></span>No</span>';
+  const stat = (k, v, sm) => `<div class="stat"><div class="k">${k}</div><div class="v${sm ? " sm" : ""}">${v}</div></div>`;
   $("meta").innerHTML =
-    cell("Trials matched", (m.total_trials_matched ?? "—").toLocaleString()) +
-    cell("Trials aggregated", (m.trials_aggregated ?? "—").toLocaleString()) +
-    cell("Sort", m.sort || "—") +
-    cell("Truncated", m.truncated ? "yes" : "no") +
-    cell("Filters applied", `<span class="code">${filters}</span>`) +
-    cell("Interpretation", m.query_interpretation || "—");
+    stat("Trials matched", (m.total_trials_matched ?? 0).toLocaleString()) +
+    stat("Trials aggregated", (m.trials_aggregated ?? 0).toLocaleString()) +
+    stat("Sort", escapeHtml(m.sort || "—"), true) +
+    stat("Truncated", yn(m.truncated), true) +
+    stat("Source", escapeHtml(m.source || "clinicaltrials.gov"), true);
+
+  const parts = [];
+  const filters = flattenFilters(m.filters_applied || {});
+  if (filters.length) {
+    parts.push('<div class="kv-row"><span class="kv-label">Filters applied</span>' +
+      filters.map(([k, v]) => `<span class="tag"><b>${escapeHtml(k)}</b><span>${escapeHtml(v)}</span></span>`).join("") + "</div>");
+  }
+  if (m.query_interpretation) {
+    parts.push('<div class="interp"><span class="lbl">Planner interpretation</span>' + escapeHtml(m.query_interpretation) + "</div>");
+  }
+  $("metaExtra").innerHTML = parts.join("");
+  show("metaExtra", parts.length > 0);
+  $("metaExtra").classList.toggle("hidden", parts.length === 0);
+}
+
+function flattenFilters(obj, prefix) {
+  const out = [];
+  for (const [k, v] of Object.entries(obj)) {
+    if (v == null || (Array.isArray(v) && v.length === 0)) continue;
+    const key = prefix ? prefix + "." + k : k;
+    if (Array.isArray(v)) out.push([key, v.join(", ")]);
+    else if (typeof v === "object") out.push(...flattenFilters(v, key));
+    else out.push([key, String(v)]);
+  }
+  return out;
 }
 
 function nodeLabel(id) { const i = id.indexOf(":"); return i < 0 ? id : id.slice(i + 1); }
@@ -265,11 +597,13 @@ function showCitations(viz) {
   if (!rows.length) { show("citeCard", false); return; }
   show("citeCard", true);
   const shown = rows.slice(0, 40);
-  $("citeNote").textContent = "— " + rows.length + " total (every excerpt is a verified substring of its source record)";
+  $("citeNote").textContent = rows.length + " references — every excerpt is a verified substring of its source record";
   $("citeBody").innerHTML = shown.map(([ctx, c]) => {
     const url = "https://clinicaltrials.gov/study/" + encodeURIComponent(c.nct_id);
-    return `<tr><td>${ctx}</td><td><a href="${url}" target="_blank" rel="noopener">${c.nct_id}</a></td>` +
-           `<td class="excerpt">${escapeHtml(c.excerpt)}</td><td class="code">${c.field ?? ""}</td></tr>`;
+    return `<tr><td class="ctx">${escapeHtml(ctx)}</td>` +
+           `<td><a class="nct mono" href="${url}" target="_blank" rel="noopener">${escapeHtml(c.nct_id)}</a></td>` +
+           `<td class="excerpt">${escapeHtml(c.excerpt)}</td>` +
+           `<td><span class="field-tag mono">${escapeHtml(c.field ?? "")}</span></td></tr>`;
   }).join("");
 }
 
