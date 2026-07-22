@@ -1,6 +1,0 @@
-# Issues and PRs are the only inbound channels; Discussions are disabled.
-blank_issues_enabled: false
-contact_links:
-  - name: Security vulnerability
-    url: https://github.com/yipjunkai/ctgov-query-viz-agent/security/advisories/new
-    about: Please report security vulnerabilities privately, not as a public issue.

@@ -1,11 +1,5 @@
 # ClinicalTrials.gov Query-to-Visualization Agent
 
-[![CI](https://github.com/yipjunkai/ctgov-query-viz-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/yipjunkai/ctgov-query-viz-agent/actions/workflows/ci.yml)
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/yipjunkai/ctgov-query-viz-agent/badge)](https://scorecard.dev/viewer/?uri=github.com/yipjunkai/ctgov-query-viz-agent)
-[![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](pyproject.toml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Ruff](https://img.shields.io/badge/lint-ruff-261230.svg)](https://github.com/astral-sh/ruff)
-
 A backend service that turns natural-language questions about clinical trials into **structured
 visualization specifications**, backed by live [ClinicalTrials.gov](https://clinicaltrials.gov/data-api/api)
 data.
