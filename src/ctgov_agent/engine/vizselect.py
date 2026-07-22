@@ -17,6 +17,7 @@ from ctgov_agent.api.schemas import (
     VizType,
 )
 from ctgov_agent.engine.aggregate import Bucket
+from ctgov_agent.engine.citations import bucket_citations, edge_citations
 from ctgov_agent.engine.network import GraphEdge, GraphNode
 from ctgov_agent.planner.ir import (
     CategoricalDim,
@@ -71,7 +72,12 @@ def distribution_chart(
             x=Channel(field="key", label=dim_label),
             y=Channel(field="value", label="Trial count"),
         ),
-        data=[DataPoint(key=b.key, label=b.label, value=b.count) for b in ordered],
+        data=[
+            DataPoint(
+                key=b.key, label=b.label, value=b.count, citations=bucket_citations(b, dim.value)
+            )
+            for b in ordered
+        ],
     )
     return viz, sort_desc
 
@@ -83,11 +89,17 @@ def time_series_chart(filters: Filters, buckets: list[Bucket]) -> tuple[ChartVis
     data: list[DataPoint] = []
     for year in range(years[0], years[-1] + 1):
         bucket = by_year.get(year)
+        citations = (
+            bucket_citations(bucket, "start_date", use_start_date=True)
+            if bucket is not None
+            else []
+        )
         data.append(
             DataPoint(
                 key=str(year),
                 label=str(year),
                 value=bucket.count if bucket is not None else 0,
+                citations=citations,
             )
         )
     viz = ChartVisualization(
@@ -112,7 +124,12 @@ def geographic_chart(filters: Filters, buckets: list[Bucket]) -> tuple[ChartVisu
             x=Channel(field="key", label="Country"),
             y=Channel(field="value", label="Trial count"),
         ),
-        data=[DataPoint(key=b.key, label=b.label, value=b.count) for b in ordered],
+        data=[
+            DataPoint(
+                key=b.key, label=b.label, value=b.count, citations=bucket_citations(b, "country")
+            )
+            for b in ordered
+        ],
     )
     return viz, "value desc"
 
@@ -138,7 +155,13 @@ def comparison_chart(
             match = next((b for b in buckets if b.key == key), None)
             if match is not None:
                 data.append(
-                    DataPoint(key=key, label=humanize(key), value=match.count, series=label)
+                    DataPoint(
+                        key=key,
+                        label=humanize(key),
+                        value=match.count,
+                        series=label,
+                        citations=bucket_citations(match, plan.dimension.value),
+                    )
                 )
     viz = ChartVisualization(
         type=VizType.grouped_bar,
@@ -165,6 +188,9 @@ def network_graph(
         nodes=[
             Node(id=n.id, label=n.label, kind=n.kind, value=n.trial_count) for n in ordered_nodes
         ],
-        edges=[Edge(source=e.source, target=e.target, weight=e.weight) for e in edges],
+        edges=[
+            Edge(source=e.source, target=e.target, weight=e.weight, citations=edge_citations(e))
+            for e in edges
+        ],
     )
     return viz, "edges by weight desc"

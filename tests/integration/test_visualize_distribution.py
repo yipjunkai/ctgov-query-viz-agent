@@ -65,6 +65,16 @@ def test_distribution_by_phase_returns_bar_chart(client_with_fake_plan: TestClie
         assert point["key"] in valid_phases
         assert point["value"] >= 1
 
+    # Deep citations flow through, and every excerpt is a real substring of its source record.
+    source = {
+        s["protocolSection"]["identificationModule"]["nctId"]: json.dumps(s)
+        for s in _FIXTURE["studies"]
+    }
+    assert any(point["citations"] for point in viz["data"])
+    for point in viz["data"]:
+        for cite in point["citations"]:
+            assert cite["excerpt"] in source[cite["nct_id"]]
+
     meta = body["meta"]
     assert meta["total_trials_matched"] == _FIXTURE["totalCount"]
     assert meta["trials_aggregated"] == len(_FIXTURE["studies"])
