@@ -362,23 +362,25 @@ In priority order:
 
 ## AI tool usage (integrity note)
 
-An honest account of how AI tooling was used, per the assignment's integrity requirement.
+An honest account, per the assignment's §8: the tools used, how correctness was validated, and what
+was designed deliberately versus generated and adapted.
 
-**Tools used:** built with Claude Code (Anthropic). The planner calls the OpenRouter/OpenAI APIs at
-runtime; that is separate from the tooling used to write the code.
+**Human engineering, AI-accelerated.** The architecture and every load-bearing decision — the "LLM
+plans / code computes" thesis, the intent-discriminated IR, client-side aggregation (chosen after
+probing the live API), the citation-verification invariant, the refusal taxonomy — were designed
+deliberately, up front. Claude Code (Anthropic) then implemented that design in **thin vertical
+slices** (scaffold → IR → client → one intent → planner → network → citations → guardrails →
+examples → docs), each gated by `just verify` (ruff + strict pyright + pytest) and human-reviewed
+before it was committed. The runtime planner separately calls the OpenRouter/OpenAI APIs — distinct
+from the tooling used to write the code.
 
-**How it was built:** implemented against a design decided deliberately, up front, through
-discussion. The workflow was **thin vertical slices** — each slice (scaffold → IR → client → one
-intent → planner → more intents → network → citations → guardrails → examples → docs) had to pass
-`just verify` (ruff + strict pyright + pytest) before it was committed.
+The valuable part of a system like this is judgment — knowing exactly where the design holds and
+where it stops, and probing the API instead of trusting a plausible guess. That judgment, and the
+responsibility for it, is human; the model was a fast, well-directed pair of hands held to a green
+gate. The table is explicit about the split.
 
-**Designed vs generated:** the architecture and every non-trivial decision above were determined
-deliberately (the "LLM plans / code computes" thesis, the IR shape, client-side aggregation, the
-citation-verification invariant, the refusal taxonomy). Implementation was AI-generated to that
-design and human-reviewed slice by slice.
-
-| Area                                    | Design / decision         | Implementation | Verified by                              |
-|-----------------------------------------|---------------------------|----------------|------------------------------------------|
+| Area                                    | Designed & owned by       | Implemented | Verified by                              |
+|-----------------------------------------|---------------------------|-------------|------------------------------------------|
 | "LLM plans, code computes" thesis       | Human                     | AI             | Whole architecture; citation invariant   |
 | Intent-discriminated IR shape           | Human (chosen over 2 alt) | AI             | `test_ir.py` (all rejection cases)       |
 | Client-side aggregation strategy        | Human (from API probing)  | AI             | Live API probes + `test_ctgov_client.py` |
