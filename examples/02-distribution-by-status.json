@@ -1,0 +1,283 @@
+{
+  "request": {
+    "query": "Break down pembrolizumab trials by recruitment status",
+    "drug_name": "Pembrolizumab"
+  },
+  "response": {
+    "status": "ok",
+    "visualization": {
+      "kind": "chart",
+      "type": "bar_chart",
+      "title": "Trials by Status for Pembrolizumab",
+      "encoding": {
+        "x": {
+          "field": "key",
+          "label": "Status"
+        },
+        "y": {
+          "field": "value",
+          "label": "Trial count"
+        },
+        "series": null
+      },
+      "data": [
+        {
+          "key": "COMPLETED",
+          "label": "Completed",
+          "value": 821,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT02955758",
+              "excerpt": "COMPLETED",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT02296684",
+              "excerpt": "COMPLETED",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT05159778",
+              "excerpt": "COMPLETED",
+              "field": "status"
+            }
+          ]
+        },
+        {
+          "key": "RECRUITING",
+          "label": "Recruiting",
+          "value": 707,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06384352",
+              "excerpt": "RECRUITING",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT05547321",
+              "excerpt": "RECRUITING",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT05679921",
+              "excerpt": "RECRUITING",
+              "field": "status"
+            }
+          ]
+        },
+        {
+          "key": "ACTIVE_NOT_RECRUITING",
+          "label": "Active Not Recruiting",
+          "value": 488,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT05215340",
+              "excerpt": "ACTIVE_NOT_RECRUITING",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT06205706",
+              "excerpt": "ACTIVE_NOT_RECRUITING",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT06212752",
+              "excerpt": "ACTIVE_NOT_RECRUITING",
+              "field": "status"
+            }
+          ]
+        },
+        {
+          "key": "TERMINATED",
+          "label": "Terminated",
+          "value": 364,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT03769532",
+              "excerpt": "TERMINATED",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT03287817",
+              "excerpt": "TERMINATED",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT05346484",
+              "excerpt": "TERMINATED",
+              "field": "status"
+            }
+          ]
+        },
+        {
+          "key": "UNKNOWN",
+          "label": "Unknown",
+          "value": 224,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06000358",
+              "excerpt": "UNKNOWN",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT03639948",
+              "excerpt": "UNKNOWN",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT02977468",
+              "excerpt": "UNKNOWN",
+              "field": "status"
+            }
+          ]
+        },
+        {
+          "key": "NOT_YET_RECRUITING",
+          "label": "Not Yet Recruiting",
+          "value": 145,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT07552558",
+              "excerpt": "NOT_YET_RECRUITING",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT06093425",
+              "excerpt": "NOT_YET_RECRUITING",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT06028633",
+              "excerpt": "NOT_YET_RECRUITING",
+              "field": "status"
+            }
+          ]
+        },
+        {
+          "key": "WITHDRAWN",
+          "label": "Withdrawn",
+          "value": 132,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT04703426",
+              "excerpt": "WITHDRAWN",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT03901378",
+              "excerpt": "WITHDRAWN",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT05093387",
+              "excerpt": "WITHDRAWN",
+              "field": "status"
+            }
+          ]
+        },
+        {
+          "key": "SUSPENDED",
+          "label": "Suspended",
+          "value": 12,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT04266730",
+              "excerpt": "SUSPENDED",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT04754321",
+              "excerpt": "SUSPENDED",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT05101356",
+              "excerpt": "SUSPENDED",
+              "field": "status"
+            }
+          ]
+        },
+        {
+          "key": "ENROLLING_BY_INVITATION",
+          "label": "Enrolling By Invitation",
+          "value": 8,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT02600949",
+              "excerpt": "ENROLLING_BY_INVITATION",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT05745233",
+              "excerpt": "ENROLLING_BY_INVITATION",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT06204614",
+              "excerpt": "ENROLLING_BY_INVITATION",
+              "field": "status"
+            }
+          ]
+        },
+        {
+          "key": "NO_LONGER_AVAILABLE",
+          "label": "No Longer Available",
+          "value": 4,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT03311542",
+              "excerpt": "NO_LONGER_AVAILABLE",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT02083484",
+              "excerpt": "NO_LONGER_AVAILABLE",
+              "field": "status"
+            },
+            {
+              "nct_id": "NCT04135092",
+              "excerpt": "NO_LONGER_AVAILABLE",
+              "field": "status"
+            }
+          ]
+        },
+        {
+          "key": "TEMPORARILY_NOT_AVAILABLE",
+          "label": "Temporarily Not Available",
+          "value": 1,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT05389514",
+              "excerpt": "TEMPORARILY_NOT_AVAILABLE",
+              "field": "status"
+            }
+          ]
+        }
+      ]
+    },
+    "meta": {
+      "source": "clinicaltrials.gov",
+      "total_trials_matched": 2906,
+      "trials_aggregated": 2906,
+      "filters_applied": {
+        "intervention": "Pembrolizumab"
+      },
+      "query_interpretation": "Planned by the deterministic rule-based fallback (no LLM key configured).",
+      "units": "trials",
+      "sort": "value desc",
+      "assumptions": [],
+      "truncated": false
+    }
+  }
+}

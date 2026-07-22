@@ -1,0 +1,178 @@
+{
+  "request": {
+    "query": "How are melanoma trials distributed across phases?",
+    "condition": "melanoma"
+  },
+  "response": {
+    "status": "ok",
+    "visualization": {
+      "kind": "chart",
+      "type": "bar_chart",
+      "title": "Trials by Phase in melanoma",
+      "encoding": {
+        "x": {
+          "field": "key",
+          "label": "Phase"
+        },
+        "y": {
+          "field": "value",
+          "label": "Trial count"
+        },
+        "series": null
+      },
+      "data": [
+        {
+          "key": "EARLY_PHASE1",
+          "label": "Early Phase 1",
+          "value": 65,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT04223648",
+              "excerpt": "EARLY_PHASE1",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT01425749",
+              "excerpt": "EARLY_PHASE1",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT05180851",
+              "excerpt": "EARLY_PHASE1",
+              "field": "phase"
+            }
+          ]
+        },
+        {
+          "key": "PHASE1",
+          "label": "Phase 1",
+          "value": 1340,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT02482532",
+              "excerpt": "PHASE1",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT03420963",
+              "excerpt": "PHASE1",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT06896552",
+              "excerpt": "PHASE1",
+              "field": "phase"
+            }
+          ]
+        },
+        {
+          "key": "PHASE2",
+          "label": "Phase 2",
+          "value": 1528,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06896552",
+              "excerpt": "PHASE2",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT04703426",
+              "excerpt": "PHASE2",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT07718243",
+              "excerpt": "PHASE2",
+              "field": "phase"
+            }
+          ]
+        },
+        {
+          "key": "PHASE3",
+          "label": "Phase 3",
+          "value": 220,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT03552549",
+              "excerpt": "PHASE3",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT01223248",
+              "excerpt": "PHASE3",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT00811200",
+              "excerpt": "PHASE3",
+              "field": "phase"
+            }
+          ]
+        },
+        {
+          "key": "PHASE4",
+          "label": "Phase 4",
+          "value": 37,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT01683188",
+              "excerpt": "PHASE4",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT01053819",
+              "excerpt": "PHASE4",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT02000739",
+              "excerpt": "PHASE4",
+              "field": "phase"
+            }
+          ]
+        },
+        {
+          "key": "NA",
+          "label": "Not Applicable",
+          "value": 411,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT04789421",
+              "excerpt": "NA",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT06880198",
+              "excerpt": "NA",
+              "field": "phase"
+            },
+            {
+              "nct_id": "NCT04293289",
+              "excerpt": "NA",
+              "field": "phase"
+            }
+          ]
+        }
+      ]
+    },
+    "meta": {
+      "source": "clinicaltrials.gov",
+      "total_trials_matched": 3736,
+      "trials_aggregated": 3736,
+      "filters_applied": {
+        "condition": "melanoma"
+      },
+      "query_interpretation": "Planned by the deterministic rule-based fallback (no LLM key configured).",
+      "units": "trials",
+      "sort": "canonical phase order",
+      "assumptions": [],
+      "truncated": false
+    }
+  }
+}

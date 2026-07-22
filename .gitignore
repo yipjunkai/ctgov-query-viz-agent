@@ -266,3 +266,6 @@ $RECYCLE.BIN/
 .claude/
 AGENTS.md
 ClinicalTrials-Assignment.md
+
+# Local API response cache for example generation (large; committed outputs live in examples/*.json)
+examples/_cache/

@@ -1,0 +1,1678 @@
+{
+  "request": {
+    "query": "Show a network of sponsors and drugs for melanoma trials",
+    "condition": "melanoma"
+  },
+  "response": {
+    "status": "ok",
+    "visualization": {
+      "kind": "network",
+      "type": "network_graph",
+      "title": "Sponsor-Intervention network in melanoma",
+      "encoding": {
+        "node_id": "id",
+        "node_label": "label",
+        "node_kind": "kind",
+        "node_size": "value",
+        "edge_source": "source",
+        "edge_target": "target",
+        "edge_weight": "weight"
+      },
+      "nodes": [
+        {
+          "id": "sponsor:National Cancer Institute (NCI)",
+          "label": "National Cancer Institute (NCI)",
+          "kind": "sponsor",
+          "value": 227
+        },
+        {
+          "id": "intervention:Pembrolizumab",
+          "label": "Pembrolizumab",
+          "kind": "intervention",
+          "value": 224
+        },
+        {
+          "id": "intervention:Nivolumab",
+          "label": "Nivolumab",
+          "kind": "intervention",
+          "value": 208
+        },
+        {
+          "id": "intervention:Ipilimumab",
+          "label": "Ipilimumab",
+          "kind": "intervention",
+          "value": 195
+        },
+        {
+          "id": "sponsor:M.D. Anderson Cancer Center",
+          "label": "M.D. Anderson Cancer Center",
+          "kind": "sponsor",
+          "value": 117
+        },
+        {
+          "id": "sponsor:Bristol-Myers Squibb",
+          "label": "Bristol-Myers Squibb",
+          "kind": "sponsor",
+          "value": 101
+        },
+        {
+          "id": "intervention:Cyclophosphamide",
+          "label": "Cyclophosphamide",
+          "kind": "intervention",
+          "value": 93
+        },
+        {
+          "id": "intervention:laboratory biomarker analysis",
+          "label": "laboratory biomarker analysis",
+          "kind": "intervention",
+          "value": 75
+        },
+        {
+          "id": "intervention:Laboratory Biomarker Analysis",
+          "label": "Laboratory Biomarker Analysis",
+          "kind": "intervention",
+          "value": 73
+        },
+        {
+          "id": "intervention:aldesleukin",
+          "label": "aldesleukin",
+          "kind": "intervention",
+          "value": 60
+        },
+        {
+          "id": "intervention:Fludarabine",
+          "label": "Fludarabine",
+          "kind": "intervention",
+          "value": 59
+        },
+        {
+          "id": "intervention:Trametinib",
+          "label": "Trametinib",
+          "kind": "intervention",
+          "value": 57
+        },
+        {
+          "id": "intervention:Vemurafenib",
+          "label": "Vemurafenib",
+          "kind": "intervention",
+          "value": 54
+        },
+        {
+          "id": "intervention:Biospecimen Collection",
+          "label": "Biospecimen Collection",
+          "kind": "intervention",
+          "value": 52
+        },
+        {
+          "id": "intervention:Placebo",
+          "label": "Placebo",
+          "kind": "intervention",
+          "value": 52
+        },
+        {
+          "id": "sponsor:Novartis Pharmaceuticals",
+          "label": "Novartis Pharmaceuticals",
+          "kind": "sponsor",
+          "value": 52
+        },
+        {
+          "id": "intervention:Dabrafenib",
+          "label": "Dabrafenib",
+          "kind": "intervention",
+          "value": 50
+        },
+        {
+          "id": "sponsor:Hoffmann-La Roche",
+          "label": "Hoffmann-La Roche",
+          "kind": "sponsor",
+          "value": 47
+        },
+        {
+          "id": "sponsor:Mayo Clinic",
+          "label": "Mayo Clinic",
+          "kind": "sponsor",
+          "value": 46
+        },
+        {
+          "id": "intervention:Aldesleukin",
+          "label": "Aldesleukin",
+          "kind": "intervention",
+          "value": 44
+        },
+        {
+          "id": "sponsor:H. Lee Moffitt Cancer Center and Research Institute",
+          "label": "H. Lee Moffitt Cancer Center and Research Institute",
+          "kind": "sponsor",
+          "value": 42
+        },
+        {
+          "id": "intervention:Computed Tomography",
+          "label": "Computed Tomography",
+          "kind": "intervention",
+          "value": 41
+        },
+        {
+          "id": "intervention:gp100 antigen",
+          "label": "gp100 antigen",
+          "kind": "intervention",
+          "value": 37
+        },
+        {
+          "id": "intervention:incomplete Freund's adjuvant",
+          "label": "incomplete Freund's adjuvant",
+          "kind": "intervention",
+          "value": 37
+        },
+        {
+          "id": "sponsor:Merck Sharp & Dohme LLC",
+          "label": "Merck Sharp & Dohme LLC",
+          "kind": "sponsor",
+          "value": 37
+        },
+        {
+          "id": "intervention:Temozolomide",
+          "label": "Temozolomide",
+          "kind": "intervention",
+          "value": 35
+        },
+        {
+          "id": "intervention:cyclophosphamide",
+          "label": "cyclophosphamide",
+          "kind": "intervention",
+          "value": 32
+        },
+        {
+          "id": "intervention:Cobimetinib",
+          "label": "Cobimetinib",
+          "kind": "intervention",
+          "value": 31
+        },
+        {
+          "id": "intervention:Questionnaire Administration",
+          "label": "Questionnaire Administration",
+          "kind": "intervention",
+          "value": 31
+        },
+        {
+          "id": "intervention:Magnetic Resonance Imaging",
+          "label": "Magnetic Resonance Imaging",
+          "kind": "intervention",
+          "value": 29
+        },
+        {
+          "id": "intervention:Atezolizumab",
+          "label": "Atezolizumab",
+          "kind": "intervention",
+          "value": 27
+        },
+        {
+          "id": "intervention:Pharmacological Study",
+          "label": "Pharmacological Study",
+          "kind": "intervention",
+          "value": 26
+        },
+        {
+          "id": "intervention:pharmacological study",
+          "label": "pharmacological study",
+          "kind": "intervention",
+          "value": 23
+        },
+        {
+          "id": "intervention:MART-1 antigen",
+          "label": "MART-1 antigen",
+          "kind": "intervention",
+          "value": 22
+        },
+        {
+          "id": "intervention:Quality-of-Life Assessment",
+          "label": "Quality-of-Life Assessment",
+          "kind": "intervention",
+          "value": 22
+        },
+        {
+          "id": "intervention:tyrosinase peptide",
+          "label": "tyrosinase peptide",
+          "kind": "intervention",
+          "value": 22
+        },
+        {
+          "id": "intervention:fludarabine phosphate",
+          "label": "fludarabine phosphate",
+          "kind": "intervention",
+          "value": 19
+        },
+        {
+          "id": "sponsor:Craig L Slingluff, Jr",
+          "label": "Craig L Slingluff, Jr",
+          "kind": "sponsor",
+          "value": 19
+        },
+        {
+          "id": "intervention:Positron Emission Tomography",
+          "label": "Positron Emission Tomography",
+          "kind": "intervention",
+          "value": 17
+        },
+        {
+          "id": "intervention:therapeutic autologous lymphocytes",
+          "label": "therapeutic autologous lymphocytes",
+          "kind": "intervention",
+          "value": 17
+        },
+        {
+          "id": "sponsor:Fred Hutchinson Cancer Center",
+          "label": "Fred Hutchinson Cancer Center",
+          "kind": "sponsor",
+          "value": 17
+        },
+        {
+          "id": "sponsor:University of Southern California",
+          "label": "University of Southern California",
+          "kind": "sponsor",
+          "value": 17
+        },
+        {
+          "id": "sponsor:National Institutes of Health Clinical Center (CC)",
+          "label": "National Institutes of Health Clinical Center (CC)",
+          "kind": "sponsor",
+          "value": 16
+        },
+        {
+          "id": "intervention:PDR001",
+          "label": "PDR001",
+          "kind": "intervention",
+          "value": 11
+        },
+        {
+          "id": "intervention:vemurafenib",
+          "label": "vemurafenib",
+          "kind": "intervention",
+          "value": 11
+        },
+        {
+          "id": "intervention:Biopsy Procedure",
+          "label": "Biopsy Procedure",
+          "kind": "intervention",
+          "value": 10
+        },
+        {
+          "id": "sponsor:Roswell Park Cancer Institute",
+          "label": "Roswell Park Cancer Institute",
+          "kind": "sponsor",
+          "value": 10
+        },
+        {
+          "id": "intervention:Non-Interventional",
+          "label": "Non-Interventional",
+          "kind": "intervention",
+          "value": 9
+        },
+        {
+          "id": "intervention:Multigated Acquisition Scan",
+          "label": "Multigated Acquisition Scan",
+          "kind": "intervention",
+          "value": 8
+        },
+        {
+          "id": "intervention:6MHP",
+          "label": "6MHP",
+          "kind": "intervention",
+          "value": 7
+        },
+        {
+          "id": "intervention:Echocardiography Test",
+          "label": "Echocardiography Test",
+          "kind": "intervention",
+          "value": 7
+        },
+        {
+          "id": "intervention:Dabrafenib Mesylate",
+          "label": "Dabrafenib Mesylate",
+          "kind": "intervention",
+          "value": 6
+        },
+        {
+          "id": "intervention:RO5185426",
+          "label": "RO5185426",
+          "kind": "intervention",
+          "value": 6
+        }
+      ],
+      "edges": [
+        {
+          "source": "sponsor:Bristol-Myers Squibb",
+          "target": "intervention:Ipilimumab",
+          "weight": 38,
+          "citations": [
+            {
+              "nct_id": "NCT04196452",
+              "excerpt": "A Retrospective Observational Study on the Long-term Effects of Ipilimumab-treated Pediatric Participants in the Dutch Melanoma Treatment Registry (DMTR)",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02320058",
+              "excerpt": "An Investigational Immuno-therapy Study to Evaluate Safety and Effectiveness in Patients With Melanoma That Has Spread to the Brain, Treated With Nivolumab in Combination With Ipilimumab, Followed by Nivolumab by Itself",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT01621490",
+              "excerpt": "PH 1 Biomarker Study of Nivolumab and Ipilimumab and Nivolumab in Combination With Ipilimumab in Advanced Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:Laboratory Biomarker Analysis",
+          "weight": 33,
+          "citations": [
+            {
+              "nct_id": "NCT01835145",
+              "excerpt": "Cabozantinib-S-Malate Compared With Temozolomide or Dacarbazine in Treating Patients With Metastatic Melanoma of the Eye That Cannot Be Removed by Surgery",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT01708941",
+              "excerpt": "Ipilimumab With or Without High-Dose Recombinant Interferon Alfa-2b in Treating Patients With Stage III-IV Melanoma That Cannot Be Removed by Surgery",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02978625",
+              "excerpt": "Talimogene Laherparepvec and Nivolumab in Treating Patients With Refractory Lymphomas or Advanced or Refractory Non-melanoma Skin Cancers",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:Cyclophosphamide",
+          "weight": 31,
+          "citations": [
+            {
+              "nct_id": "NCT02054104",
+              "excerpt": "Adjuvant Tumor Lysate Vaccine and Iscomatrix With or Without Metronomic Oral Cyclophosphamide and Celecoxib in Patients With Malignancies Involving Lungs, Esophagus, Pleura, or Mediastinum",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT01369875",
+              "excerpt": "Modified Tumor Infiltrating Lymphocytes for Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00001832",
+              "excerpt": "Lymphocyte Re-infusion During Immune Suppression to Treat Metastatic Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:laboratory biomarker analysis",
+          "weight": 29,
+          "citations": [
+            {
+              "nct_id": "NCT00006003",
+              "excerpt": "SU5416 in Treating Patients With Metastatic Melanoma That Has Been Previously Treated",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00470470",
+              "excerpt": "Imatinib Mesylate in Treating Patients With Stage III or Stage IV Melanoma That Cannot Be Removed by Surgery",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00074308",
+              "excerpt": "Imatinib Mesylate and Bevacizumab in Treating Patients With Advanced Melanoma or Other Advanced Cancers",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:Aldesleukin",
+          "weight": 28,
+          "citations": [
+            {
+              "nct_id": "NCT01369875",
+              "excerpt": "Modified Tumor Infiltrating Lymphocytes for Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02489266",
+              "excerpt": "In Vivo Persistence of Adoptively-Transferred TIL Cultured With Akti in People With Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02153905",
+              "excerpt": "T Cell Receptor Immunotherapy Targeting MAGE-A3 for Patients With Metastatic Cancer Who Are HLA-A*01 Positive",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:Fludarabine",
+          "weight": 25,
+          "citations": [
+            {
+              "nct_id": "NCT01369875",
+              "excerpt": "Modified Tumor Infiltrating Lymphocytes for Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00001832",
+              "excerpt": "Lymphocyte Re-infusion During Immune Suppression to Treat Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02489266",
+              "excerpt": "In Vivo Persistence of Adoptively-Transferred TIL Cultured With Akti in People With Metastatic Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Bristol-Myers Squibb",
+          "target": "intervention:Nivolumab",
+          "weight": 24,
+          "citations": [
+            {
+              "nct_id": "NCT02320058",
+              "excerpt": "An Investigational Immuno-therapy Study to Evaluate Safety and Effectiveness in Patients With Melanoma That Has Spread to the Brain, Treated With Nivolumab in Combination With Ipilimumab, Followed by Nivolumab by Itself",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT05002569",
+              "excerpt": "A Study to Assess Adjuvant Immunotherapy With Nivolumab Plus Relatlimab Versus Nivolumab Alone After Complete Resection of Stage III-IV Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT01621490",
+              "excerpt": "PH 1 Biomarker Study of Nivolumab and Ipilimumab and Nivolumab in Combination With Ipilimumab in Advanced Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:aldesleukin",
+          "weight": 24,
+          "citations": [
+            {
+              "nct_id": "NCT00020397",
+              "excerpt": "Vaccine Therapy in Treating Patients With Refractory Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00019331",
+              "excerpt": "Vaccine Therapy Plus Biological Therapy in Treating Adults With Metastatic Solid Tumors",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00670748",
+              "excerpt": "Chemotherapy Followed by ESO-1 Lymphocytes and Aldesleukin to Treat Metastatic Cancer",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Merck Sharp & Dohme LLC",
+          "target": "intervention:Pembrolizumab",
+          "weight": 23,
+          "citations": [
+            {
+              "nct_id": "NCT03820986",
+              "excerpt": "Safety and Efficacy Study of Pembrolizumab (MK-3475) Combined With Lenvatinib (MK-7902/E7080) as First-line Intervention in Adults With Advance Melanoma (MK-7902-003/E7080-G000-312/LEAP-003)",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT05933577",
+              "excerpt": "A Clinical Study of Intismeran Autogene (V940) Plus Pembrolizumab in People With High-Risk Melanoma (V940-001)",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT06099782",
+              "excerpt": "A Study of Participant Reported Preference for Subcutaneous Pembrolizumab Coformulated With Berahyaluronidase Alfa (MK-3475A) Over Intravenous Pembrolizumab (MK-3475) Formulation in Multiple Tumor Types (MK-3475A-F11)",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:Computed Tomography",
+          "weight": 19,
+          "citations": [
+            {
+              "nct_id": "NCT04557956",
+              "excerpt": "Testing the Addition of the Anti-cancer Drug, Tazemetostat, to the Usual Treatment (Dabrafenib and Trametinib) for Metastatic Melanoma That Has Progressed on the Usual Treatment",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02775851",
+              "excerpt": "Pembrolizumab in Treating Patients With Desmoplastic Melanoma That Can or Cannot Be Removed by Surgery",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT05896839",
+              "excerpt": "Immunotherapy in Combination With Prednisone and Sirolimus for Kidney Transplant Recipients With Unresectable or Metastatic Skin Cancer",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:Biospecimen Collection",
+          "weight": 19,
+          "citations": [
+            {
+              "nct_id": "NCT02775851",
+              "excerpt": "Pembrolizumab in Treating Patients With Desmoplastic Melanoma That Can or Cannot Be Removed by Surgery",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT03707574",
+              "excerpt": "Genetic Analysis of Blood and Tissue Samples From Patients With Advanced Cancer, Moonshot Study",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT05896839",
+              "excerpt": "Immunotherapy in Combination With Prednisone and Sirolimus for Kidney Transplant Recipients With Unresectable or Metastatic Skin Cancer",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:Pharmacological Study",
+          "weight": 18,
+          "citations": [
+            {
+              "nct_id": "NCT01366144",
+              "excerpt": "Veliparib, Paclitaxel, and Carboplatin in Treating Patients With Solid Tumors That Are Metastatic or Cannot Be Removed by Surgery and Liver or Kidney Dysfunction",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02363283",
+              "excerpt": "Glembatumumab Vedotin in Treating Patients With Metastatic or Locally Recurrent Uveal Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT01709435",
+              "excerpt": "Cabozantinib S-Malate in Treating Younger Patients With Recurrent or Refractory Solid Tumors",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:M.D. Anderson Cancer Center",
+          "target": "intervention:Ipilimumab",
+          "weight": 17,
+          "citations": [
+            {
+              "nct_id": "NCT01590082",
+              "excerpt": "Doxycycline, Temozolomide and Ipilimumab in Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02419495",
+              "excerpt": "Phase IB Study to Evaluate the Safety of Selinexor (KPT-330) in Combination With Multiple Standard Chemotherapy or Immunotherapy Agents in Patients With Advanced Malignancies",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT06683755",
+              "excerpt": "Phase I/IIa Dose Finding Study of Triplet Regimen of Relatlimab Ipilimumab and NIvolumab in First Line Therapy of Metastatic Melanoma (TRINITY)",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:gp100 antigen",
+          "weight": 16,
+          "citations": [
+            {
+              "nct_id": "NCT00019396",
+              "excerpt": "flt3L With or Without Vaccine Therapy in Treating Patients With Metastatic Melanoma or Renal Cell Cancer",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00072085",
+              "excerpt": "Immunization With gp100 Protein Vaccine in Treating Patients With Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00006243",
+              "excerpt": "Vaccine Therapy and Sargramostim in Treating Patients With Stage IV Malignant Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:incomplete Freund's adjuvant",
+          "weight": 15,
+          "citations": [
+            {
+              "nct_id": "NCT00072085",
+              "excerpt": "Immunization With gp100 Protein Vaccine in Treating Patients With Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00006243",
+              "excerpt": "Vaccine Therapy and Sargramostim in Treating Patients With Stage IV Malignant Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00032045",
+              "excerpt": "Vaccine Therapy and Monoclonal Antibody Therapy in Treating Patients With Stage IV Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Hoffmann-La Roche",
+          "target": "intervention:Vemurafenib",
+          "weight": 14,
+          "citations": [
+            {
+              "nct_id": "NCT01006980",
+              "excerpt": "A Study of Vemurafenib (RO5185426) in Comparison With Dacarbazine in Previously Untreated Patients With Metastatic Melanoma (BRIM 3)",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT01765569",
+              "excerpt": "A Pharmacokinetics Study to Investigate the Effect of Vemurafenib on Digoxin in Patients With BRAFV600 Mutation-Positive Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02908672",
+              "excerpt": "A Study of Atezolizumab Plus Cobimetinib and Vemurafenib Versus Placebo Plus Cobimetinib and Vemurafenib in Previously Untreated BRAFv600 Mutation-Positive Patients With Metastatic or Unresectable Locally Advanced Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:Ipilimumab",
+          "weight": 14,
+          "citations": [
+            {
+              "nct_id": "NCT05896839",
+              "excerpt": "Immunotherapy in Combination With Prednisone and Sirolimus for Kidney Transplant Recipients With Unresectable or Metastatic Skin Cancer",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT01708941",
+              "excerpt": "Ipilimumab With or Without High-Dose Recombinant Interferon Alfa-2b in Treating Patients With Stage III-IV Melanoma That Cannot Be Removed by Surgery",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02506153",
+              "excerpt": "Physician/Patient Choice of Either High-Dose Recombinant Interferon Alfa-2B or Ipilimumab, Versus Pembrolizumab in Treating Patients With Stage III-IV High Risk Melanoma That Has Been Removed by Surgery",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:Nivolumab",
+          "weight": 14,
+          "citations": [
+            {
+              "nct_id": "NCT05896839",
+              "excerpt": "Immunotherapy in Combination With Prednisone and Sirolimus for Kidney Transplant Recipients With Unresectable or Metastatic Skin Cancer",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02978625",
+              "excerpt": "Talimogene Laherparepvec and Nivolumab in Treating Patients With Refractory Lymphomas or Advanced or Refractory Non-melanoma Skin Cancers",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT04514484",
+              "excerpt": "Testing the Combination of the Anti-cancer Drugs XL184 (Cabozantinib) and Nivolumab in Patients With Advanced Cancer and HIV",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:M.D. Anderson Cancer Center",
+          "target": "intervention:Cyclophosphamide",
+          "weight": 12,
+          "citations": [
+            {
+              "nct_id": "NCT03420963",
+              "excerpt": "Donor Natural Killer Cells, Cyclophosphamide, and Etoposide in Treating Children and Young Adults With Relapsed or Refractory Solid Tumors",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02419495",
+              "excerpt": "Phase IB Study to Evaluate the Safety of Selinexor (KPT-330) in Combination With Multiple Standard Chemotherapy or Immunotherapy Agents in Patients With Advanced Malignancies",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT05470283",
+              "excerpt": "Phase I, Open-Label, Study of Tumor Infiltrating Lymphocytes Engineered With Membrane Bound IL15 Plus Acetazolamide in Adult Patients With Metastatic Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:Magnetic Resonance Imaging",
+          "weight": 11,
+          "citations": [
+            {
+              "nct_id": "NCT04557956",
+              "excerpt": "Testing the Addition of the Anti-cancer Drug, Tazemetostat, to the Usual Treatment (Dabrafenib and Trametinib) for Metastatic Melanoma That Has Progressed on the Usual Treatment",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT05896839",
+              "excerpt": "Immunotherapy in Combination With Prednisone and Sirolimus for Kidney Transplant Recipients With Unresectable or Metastatic Skin Cancer",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT01902173",
+              "excerpt": "Uprosertib, Dabrafenib, and Trametinib in Treating Patients With Stage IIIC-IV Cancer",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Novartis Pharmaceuticals",
+          "target": "intervention:Trametinib",
+          "weight": 11,
+          "citations": [
+            {
+              "nct_id": "NCT01597908",
+              "excerpt": "Dabrafenib Plus Trametinib vs Vemurafenib Alone in Unresectable or Metastatic BRAF V600E/K Cutaneous Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT03551626",
+              "excerpt": "Study of Dabrafenib+Trametinib in the Adjuvant Treatment of Stage III BRAF V600+ Melanoma After Complete Resection to Evaluate the Impact on Pyrexia Related Outcomes",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02967692",
+              "excerpt": "A Study of the Anti-PD1 Antibody PDR001, in Combination With Dabrafenib and Trametinib in Advanced Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:M.D. Anderson Cancer Center",
+          "target": "intervention:Laboratory Biomarker Analysis",
+          "weight": 11,
+          "citations": [
+            {
+              "nct_id": "NCT01590069",
+              "excerpt": "Aerosolized Aldesleukin in Treating Patients With Lung Metastases",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02519322",
+              "excerpt": "Neoadjuvant and Adjuvant Checkpoint Blockade",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02027935",
+              "excerpt": "CD8+ Antigen-Specific T Cells, Cyclophosphamide, Aldesleukin, and Ipilimumab in Treating Patients With Metastatic Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:M.D. Anderson Cancer Center",
+          "target": "intervention:Quality-of-Life Assessment",
+          "weight": 11,
+          "citations": [
+            {
+              "nct_id": "NCT01644591",
+              "excerpt": "Stereotactic Radiosurgery in Treating Patients With Greater Than 3 Melanoma Brain Metastases",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT01740557",
+              "excerpt": "Genetically Modified Therapeutic Autologous Lymphocytes Followed by Aldesleukin in Treating Patients With Stage III or Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT03175432",
+              "excerpt": "Bevacizumab and Atezolizumab With or Without Cobimetinib in Treating Patients With Untreated Melanoma Brain Metastases",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:M.D. Anderson Cancer Center",
+          "target": "intervention:Nivolumab",
+          "weight": 10,
+          "citations": [
+            {
+              "nct_id": "NCT03025256",
+              "excerpt": "Intravenous and Intrathecal Nivolumab in Treating Patients With Leptomeningeal Disease",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02419495",
+              "excerpt": "Phase IB Study to Evaluate the Safety of Selinexor (KPT-330) in Combination With Multiple Standard Chemotherapy or Immunotherapy Agents in Patients With Advanced Malignancies",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT06683755",
+              "excerpt": "Phase I/IIa Dose Finding Study of Triplet Regimen of Relatlimab Ipilimumab and NIvolumab in First Line Therapy of Metastatic Melanoma (TRINITY)",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:Pembrolizumab",
+          "weight": 10,
+          "citations": [
+            {
+              "nct_id": "NCT02775851",
+              "excerpt": "Pembrolizumab in Treating Patients With Desmoplastic Melanoma That Can or Cannot Be Removed by Surgery",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT03698019",
+              "excerpt": "A Study to Compare the Administration of Pembrolizumab After Surgery Versus Administration Both Before and After Surgery for High-Risk Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02965716",
+              "excerpt": "Talimogene Laherparepvec and Pembrolizumab in Treating Patients With Stage III-IV Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:pharmacological study",
+          "weight": 10,
+          "citations": [
+            {
+              "nct_id": "NCT00074308",
+              "excerpt": "Imatinib Mesylate and Bevacizumab in Treating Patients With Advanced Melanoma or Other Advanced Cancers",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00072189",
+              "excerpt": "A Phase II Study of UCN-01 in Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00003789",
+              "excerpt": "Melphalan With or Without Tumor Necrosis Factor in Treating Patients With Locally Advanced Melanoma of the Arm or Leg",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Novartis Pharmaceuticals",
+          "target": "intervention:PDR001",
+          "weight": 10,
+          "citations": [
+            {
+              "nct_id": "NCT02807844",
+              "excerpt": "Phase Ib/II Study of MCS110 in Combination With PDR001 in Patients With Advanced Malignancies",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02404441",
+              "excerpt": "Phase I/II Study of PDR001 in Patients With Advanced Malignancies",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02608268",
+              "excerpt": "Phase I-Ib/II Study of MBG453 as Single Agent and in Combination With PDR001 in Patients With Advanced Malignancies",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:H. Lee Moffitt Cancer Center and Research Institute",
+          "target": "intervention:Nivolumab",
+          "weight": 9,
+          "citations": [
+            {
+              "nct_id": "NCT04526730",
+              "excerpt": "Neoadjuvant Immunotherapy With Tavo + Electroporation in Combination With Nivo. in Melanoma Patients",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT03834623",
+              "excerpt": "Avadomide (CC-122) in Combination With Nivolumab in Advanced Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT05704933",
+              "excerpt": "Pilot Study of Nivolumab w/Ipilimumab or Relatlimab in Surgically Resectable Melanoma Brain Metastases",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:Biopsy Procedure",
+          "weight": 9,
+          "citations": [
+            {
+              "nct_id": "NCT04557956",
+              "excerpt": "Testing the Addition of the Anti-cancer Drug, Tazemetostat, to the Usual Treatment (Dabrafenib and Trametinib) for Metastatic Melanoma That Has Progressed on the Usual Treatment",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02775851",
+              "excerpt": "Pembrolizumab in Treating Patients With Desmoplastic Melanoma That Can or Cannot Be Removed by Surgery",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT05896839",
+              "excerpt": "Immunotherapy in Combination With Prednisone and Sirolimus for Kidney Transplant Recipients With Unresectable or Metastatic Skin Cancer",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Mayo Clinic",
+          "target": "intervention:Biospecimen Collection",
+          "weight": 9,
+          "citations": [
+            {
+              "nct_id": "NCT05653661",
+              "excerpt": "Nab-Paclitaxel/STI-3031 Complex (AP160-Complex) for the Treatment of Advanced or Metastatic Solid Tumors",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT04067960",
+              "excerpt": "Pharmacogenomics Testing in the Optimal Use of Supportive Care Medications in Stage III-IV Cancer",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT04967196",
+              "excerpt": "Ipilimumab and Nivolumab for the Treatment of Stage III-IV Unresectable Metastatic Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Novartis Pharmaceuticals",
+          "target": "intervention:Dabrafenib",
+          "weight": 9,
+          "citations": [
+            {
+              "nct_id": "NCT01597908",
+              "excerpt": "Dabrafenib Plus Trametinib vs Vemurafenib Alone in Unresectable or Metastatic BRAF V600E/K Cutaneous Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT03551626",
+              "excerpt": "Study of Dabrafenib+Trametinib in the Adjuvant Treatment of Stage III BRAF V600+ Melanoma After Complete Resection to Evaluate the Impact on Pyrexia Related Outcomes",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02967692",
+              "excerpt": "A Study of the Anti-PD1 Antibody PDR001, in Combination With Dabrafenib and Trametinib in Advanced Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:University of Southern California",
+          "target": "intervention:tyrosinase peptide",
+          "weight": 8,
+          "citations": [
+            {
+              "nct_id": "NCT00085189",
+              "excerpt": "Vaccine Therapy in Treating Patients With Stage IIC-IV Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00003274",
+              "excerpt": "Vaccine Therapy in Treating Patients With Stage II Melanoma That Can Be Removed by Surgery",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00003339",
+              "excerpt": "Vaccine Therapy With or Without Interleukin-12 in Treating Patients With Stage III or Stage IV Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Fred Hutchinson Cancer Center",
+          "target": "intervention:aldesleukin",
+          "weight": 8,
+          "citations": [
+            {
+              "nct_id": "NCT00553306",
+              "excerpt": "Laboratory-Treated T Cells and Aldesleukin After Cyclophosphamide in Treating Patients With Stage IV Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00045149",
+              "excerpt": "Biological Therapy in Treating Patients With Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT01005537",
+              "excerpt": "Cyclophosphamide, Autologous Lymphocytes, and Aldesleukin in Treating Patients With Metastatic Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:M.D. Anderson Cancer Center",
+          "target": "intervention:Pembrolizumab",
+          "weight": 8,
+          "citations": [
+            {
+              "nct_id": "NCT02419495",
+              "excerpt": "Phase IB Study to Evaluate the Safety of Selinexor (KPT-330) in Combination With Multiple Standard Chemotherapy or Immunotherapy Agents in Patients With Advanced Malignancies",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT04902040",
+              "excerpt": "Plinabulin in Combination With Radiation/Immunotherapy in Patients With Select Advanced Cancers After Progression on PD-1 or PD-L1 Targeted Antibodies",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02719015",
+              "excerpt": "Dose Escalation and Cohort Expansion of Safety and Tolerability Study of Intratumoral rAd.CD40L (ISF35) in Combination of Systemic Pembrolizumab in Patients With Refractory Metastatic Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:M.D. Anderson Cancer Center",
+          "target": "intervention:Questionnaire Administration",
+          "weight": 8,
+          "citations": [
+            {
+              "nct_id": "NCT03950635",
+              "excerpt": "Dietary Intervention in Patients with a History of Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT01644591",
+              "excerpt": "Stereotactic Radiosurgery in Treating Patients With Greater Than 3 Melanoma Brain Metastases",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT04645680",
+              "excerpt": "Diet and Immune Effects Trial: DIET- A Randomized Double Blinded Dietary Intervention Study in Patients With Metastatic Melanoma Receiving Immunotherapy",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:MART-1 antigen",
+          "weight": 8,
+          "citations": [
+            {
+              "nct_id": "NCT00019396",
+              "excerpt": "flt3L With or Without Vaccine Therapy in Treating Patients With Metastatic Melanoma or Renal Cell Cancer",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00091338",
+              "excerpt": "Interleukin-7 and Vaccine Therapy in Treating Patients With Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00020475",
+              "excerpt": "Vaccine Therapy in Treating Patients With Metastatic Melanoma of the Eye",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Bristol-Myers Squibb",
+          "target": "intervention:Non-Interventional",
+          "weight": 8,
+          "citations": [
+            {
+              "nct_id": "NCT03450876",
+              "excerpt": "Long Term Quality of Life in Melanoma Patients in Netherlands",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT03165422",
+              "excerpt": "A Real-World Study of Ipilimumab Treatment After Nivolumab Treatment in Melanoma in Japan",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT03205722",
+              "excerpt": "The Effectiveness of Nivolumab Monotherapy as First-Line Therapy in Adults With Advanced Melanoma in Germany",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Hoffmann-La Roche",
+          "target": "intervention:Cobimetinib",
+          "weight": 8,
+          "citations": [
+            {
+              "nct_id": "NCT02908672",
+              "excerpt": "A Study of Atezolizumab Plus Cobimetinib and Vemurafenib Versus Placebo Plus Cobimetinib and Vemurafenib in Previously Untreated BRAFv600 Mutation-Positive Patients With Metastatic or Unresectable Locally Advanced Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT03625141",
+              "excerpt": "A Study Evaluating the Safety and Efficacy of Cobimetinib Plus Atezolizumab in BRAFV600 Wild-type Melanoma With Central Nervous System Metastases and Cobimetinib Plus Atezolizumab and Vemurafenib in BRAFV600 Mutation-positive Melanoma With Central Nervous System Metastases",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT03273153",
+              "excerpt": "A Study of Cobimetinib Plus Atezolizumab Versus Pembrolizumab in Participants With Previously Untreated Advanced BRAFv600 Wild-Type Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:University of Southern California",
+          "target": "intervention:gp100 antigen",
+          "weight": 7,
+          "citations": [
+            {
+              "nct_id": "NCT00085189",
+              "excerpt": "Vaccine Therapy in Treating Patients With Stage IIC-IV Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00003274",
+              "excerpt": "Vaccine Therapy in Treating Patients With Stage II Melanoma That Can Be Removed by Surgery",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00003339",
+              "excerpt": "Vaccine Therapy With or Without Interleukin-12 in Treating Patients With Stage III or Stage IV Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Fred Hutchinson Cancer Center",
+          "target": "intervention:therapeutic autologous lymphocytes",
+          "weight": 7,
+          "citations": [
+            {
+              "nct_id": "NCT00553306",
+              "excerpt": "Laboratory-Treated T Cells and Aldesleukin After Cyclophosphamide in Treating Patients With Stage IV Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT01005537",
+              "excerpt": "Cyclophosphamide, Autologous Lymphocytes, and Aldesleukin in Treating Patients With Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT01339663",
+              "excerpt": "Vaccine Therapy Following Therapeutic Autologous Lymphocytes and Cyclophosphamide in Treating Patients With Metastatic Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:Echocardiography Test",
+          "weight": 7,
+          "citations": [
+            {
+              "nct_id": "NCT04557956",
+              "excerpt": "Testing the Addition of the Anti-cancer Drug, Tazemetostat, to the Usual Treatment (Dabrafenib and Trametinib) for Metastatic Melanoma That Has Progressed on the Usual Treatment",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02196181",
+              "excerpt": "Testing Two Different Treatment Schedules of Dabrafenib and Trametinib for Skin Cancer Which Has Spread",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT05111574",
+              "excerpt": "Using Nivolumab Alone or With Cabozantinib to Prevent Mucosal Melanoma Return After Surgery",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:Positron Emission Tomography",
+          "weight": 7,
+          "citations": [
+            {
+              "nct_id": "NCT02775851",
+              "excerpt": "Pembrolizumab in Treating Patients With Desmoplastic Melanoma That Can or Cannot Be Removed by Surgery",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02196181",
+              "excerpt": "Testing Two Different Treatment Schedules of Dabrafenib and Trametinib for Skin Cancer Which Has Spread",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02506153",
+              "excerpt": "Physician/Patient Choice of Either High-Dose Recombinant Interferon Alfa-2B or Ipilimumab, Versus Pembrolizumab in Treating Patients With Stage III-IV High Risk Melanoma That Has Been Removed by Surgery",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Roswell Park Cancer Institute",
+          "target": "intervention:Laboratory Biomarker Analysis",
+          "weight": 7,
+          "citations": [
+            {
+              "nct_id": "NCT01886235",
+              "excerpt": "Intravital Microscopy for Identifying Tumor Vessels in Patients With Stage IA-IV Melanoma That is Being Removed by Surgery",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02650986",
+              "excerpt": "Gene-Modified T Cells With or Without Decitabine in Treating Patients With Advanced Malignancies Expressing NY-ESO-1",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT01744171",
+              "excerpt": "Vaccine Therapy in Treating Patients With Advanced Stage III-IV Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Mayo Clinic",
+          "target": "intervention:Questionnaire Administration",
+          "weight": 7,
+          "citations": [
+            {
+              "nct_id": "NCT04067960",
+              "excerpt": "Pharmacogenomics Testing in the Optimal Use of Supportive Care Medications in Stage III-IV Cancer",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT07379138",
+              "excerpt": "Studying Quality of Life Inclusive of Mental Health and Cognitive Behavioral Therapy for Cancer Distress for the Improvement of Quality of Life in Stage III-IV Melanoma Patients",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT05388851",
+              "excerpt": "Education for Prevention of Melanoma in Hispanic Populations",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Institutes of Health Clinical Center (CC)",
+          "target": "intervention:cyclophosphamide",
+          "weight": 7,
+          "citations": [
+            {
+              "nct_id": "NCT00704938",
+              "excerpt": "Gene-Modified Lymphocytes, High-Dose Aldesleukin, and Vaccine Therapy in Treating Patients With Progressive or Recurrent Metastatic Cancer",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00062036",
+              "excerpt": "Cyclophosphamide and Fludarabine Followed By Interleukin-2 Gene-Modified Tumor Infiltrating Lymphocytes in Treating Patients With Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00138229",
+              "excerpt": "Cyclophosphamide and Fludarabine Followed By an Autologous Lymphocyte Infusion and Interleukin-2 in Treating Patients With Refractory or Recurrent Metastatic Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:H. Lee Moffitt Cancer Center and Research Institute",
+          "target": "intervention:Ipilimumab",
+          "weight": 7,
+          "citations": [
+            {
+              "nct_id": "NCT05704933",
+              "excerpt": "Pilot Study of Nivolumab w/Ipilimumab or Relatlimab in Surgically Resectable Melanoma Brain Metastases",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT01701674",
+              "excerpt": "Ipilimumab With Lymphodepletion Plus Adoptive Cell Transfer and High Dose IL-2 in Melanoma Mets Pts",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT04996823",
+              "excerpt": "Axitinib + Ipilimumab in Advanced Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:University of Southern California",
+          "target": "intervention:incomplete Freund's adjuvant",
+          "weight": 6,
+          "citations": [
+            {
+              "nct_id": "NCT00085189",
+              "excerpt": "Vaccine Therapy in Treating Patients With Stage IIC-IV Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00003274",
+              "excerpt": "Vaccine Therapy in Treating Patients With Stage II Melanoma That Can Be Removed by Surgery",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00003339",
+              "excerpt": "Vaccine Therapy With or Without Interleukin-12 in Treating Patients With Stage III or Stage IV Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:Dabrafenib Mesylate",
+          "weight": 6,
+          "citations": [
+            {
+              "nct_id": "NCT04557956",
+              "excerpt": "Testing the Addition of the Anti-cancer Drug, Tazemetostat, to the Usual Treatment (Dabrafenib and Trametinib) for Metastatic Melanoma That Has Progressed on the Usual Treatment",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT01902173",
+              "excerpt": "Uprosertib, Dabrafenib, and Trametinib in Treating Patients With Stage IIIC-IV Cancer",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02196181",
+              "excerpt": "Testing Two Different Treatment Schedules of Dabrafenib and Trametinib for Skin Cancer Which Has Spread",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:Multigated Acquisition Scan",
+          "weight": 6,
+          "citations": [
+            {
+              "nct_id": "NCT04557956",
+              "excerpt": "Testing the Addition of the Anti-cancer Drug, Tazemetostat, to the Usual Treatment (Dabrafenib and Trametinib) for Metastatic Melanoma That Has Progressed on the Usual Treatment",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02196181",
+              "excerpt": "Testing Two Different Treatment Schedules of Dabrafenib and Trametinib for Skin Cancer Which Has Spread",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02224781",
+              "excerpt": "Dabrafenib and Trametinib Followed by Ipilimumab and Nivolumab or Ipilimumab and Nivolumab Followed by Dabrafenib and Trametinib in Treating Patients With Stage III-IV BRAFV600 Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:M.D. Anderson Cancer Center",
+          "target": "intervention:Temozolomide",
+          "weight": 6,
+          "citations": [
+            {
+              "nct_id": "NCT01590082",
+              "excerpt": "Doxycycline, Temozolomide and Ipilimumab in Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00970996",
+              "excerpt": "Cisplatin, Temozolomide, Abraxane, With Interleukin-2 and Interferon for Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00527657",
+              "excerpt": "Temozolomide, Thalidomide, and Lomustine (TTL) in Melanoma Patients",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Hoffmann-La Roche",
+          "target": "intervention:Atezolizumab",
+          "weight": 6,
+          "citations": [
+            {
+              "nct_id": "NCT04091217",
+              "excerpt": "Atezolizumab in Combination With Bevacizumab in Patients With Unresectable Locally Advanced or Metastatic Mucosal Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT05116202",
+              "excerpt": "A Study Evaluating the Efficacy and Safety of Multiple Treatment Combinations in Patients With Melanoma (Morpheus-Melanoma)",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02908672",
+              "excerpt": "A Study of Atezolizumab Plus Cobimetinib and Vemurafenib Versus Placebo Plus Cobimetinib and Vemurafenib in Previously Untreated BRAFv600 Mutation-Positive Patients With Metastatic or Unresectable Locally Advanced Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Craig L Slingluff, Jr",
+          "target": "intervention:6MHP",
+          "weight": 6,
+          "citations": [
+            {
+              "nct_id": "NCT02385669",
+              "excerpt": "A Phase I/II Trial to Evaluate a Peptide Vaccine Plus Ipilimumab in Patients With Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT02515227",
+              "excerpt": "Safety Study of a Helper Peptide Vaccine Plus Pembrolizumab",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT03617328",
+              "excerpt": "Vaccination With 6MHP, With or Without Systemic CDX-1127, in Patients With Stage II-IV Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:fludarabine phosphate",
+          "weight": 6,
+          "citations": [
+            {
+              "nct_id": "NCT00670748",
+              "excerpt": "Chemotherapy Followed by ESO-1 Lymphocytes and Aldesleukin to Treat Metastatic Cancer",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00303836",
+              "excerpt": "Vaccine Therapy With or Without Interleukin-2 After Chemotherapy and an Autologous White Blood Cell Infusion in Treating Patients With Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00509496",
+              "excerpt": "Phase II Study of Metastatic Melanoma With Lymphodepleting Conditioning and Anti-gp100:154-162 TCR Gene Engineered Lymphocytes",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Mayo Clinic",
+          "target": "intervention:Computed Tomography",
+          "weight": 6,
+          "citations": [
+            {
+              "nct_id": "NCT05653661",
+              "excerpt": "Nab-Paclitaxel/STI-3031 Complex (AP160-Complex) for the Treatment of Advanced or Metastatic Solid Tumors",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT05717140",
+              "excerpt": "Aerosolized Sargramostim Added to Immunotherapy for the Treatment of Patients With Metastatic Melanoma to the Lung",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT05388877",
+              "excerpt": "E6201 and Dabrafenib for the Treatment of Central Nervous System Metastases From BRAF V600 Mutated Metastatic Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Mayo Clinic",
+          "target": "intervention:Magnetic Resonance Imaging",
+          "weight": 6,
+          "citations": [
+            {
+              "nct_id": "NCT05653661",
+              "excerpt": "Nab-Paclitaxel/STI-3031 Complex (AP160-Complex) for the Treatment of Advanced or Metastatic Solid Tumors",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT05717140",
+              "excerpt": "Aerosolized Sargramostim Added to Immunotherapy for the Treatment of Patients With Metastatic Melanoma to the Lung",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT05388877",
+              "excerpt": "E6201 and Dabrafenib for the Treatment of Central Nervous System Metastases From BRAF V600 Mutated Metastatic Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:National Cancer Institute (NCI)",
+          "target": "intervention:tyrosinase peptide",
+          "weight": 6,
+          "citations": [
+            {
+              "nct_id": "NCT00019396",
+              "excerpt": "flt3L With or Without Vaccine Therapy in Treating Patients With Metastatic Melanoma or Renal Cell Cancer",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00006243",
+              "excerpt": "Vaccine Therapy and Sargramostim in Treating Patients With Stage IV Malignant Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00019383",
+              "excerpt": "Vaccine Therapy in Treating Patients With Recurrent or Refractory Metastatic Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Bristol-Myers Squibb",
+          "target": "intervention:Placebo",
+          "weight": 6,
+          "citations": [
+            {
+              "nct_id": "NCT00636168",
+              "excerpt": "Efficacy Study of Ipilimumab Versus Placebo to Prevent Recurrence After Complete Resection of High Risk Stage III Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT03329846",
+              "excerpt": "An Investigational Immuno-therapy Study of BMS-986205 Combined With Nivolumab, Compared to Nivolumab by Itself, in Patients With Advanced Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT04099251",
+              "excerpt": "Effectiveness Study of Nivolumab Compared to Placebo in Prevention of Recurrent Melanoma After Complete Resection of Stage IIB/C Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Mayo Clinic",
+          "target": "intervention:laboratory biomarker analysis",
+          "weight": 6,
+          "citations": [
+            {
+              "nct_id": "NCT01748747",
+              "excerpt": "Vaccine Therapy and Resiquimod in Treating Patients With Stage II-IV Melanoma That Has Been Removed By Surgery",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00658892",
+              "excerpt": "Monoclonal Antibody Therapy in Treating Patients With Stage IV Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00568763",
+              "excerpt": "Radiofrequency Therapy-Induced Endogenous Heat-Shock Proteins With or Without Radiofrequency Ablation or Cryotherapy in Treating Patients With Stage IV Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Hoffmann-La Roche",
+          "target": "intervention:RO5185426",
+          "weight": 6,
+          "citations": [
+            {
+              "nct_id": "NCT01107418",
+              "excerpt": "A Pharmacokinetic/Pharmacodynamic Study of RO5185426 in Previously Treated Patients With Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT01248936",
+              "excerpt": "A Study of RO5185426 in Patients With Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT01164891",
+              "excerpt": "A Pharmacokinetic and Metabolism Study of 14C-labeled RO5185426 on Patients With Metastatic Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        },
+        {
+          "source": "sponsor:Hoffmann-La Roche",
+          "target": "intervention:vemurafenib",
+          "weight": 6,
+          "citations": [
+            {
+              "nct_id": "NCT01765556",
+              "excerpt": "A Pharmacokinetics Study to Investigate the Effect of Ketoconazole on Vemurafenib in Patients With BRAFV600 Mutation-Positive Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT00949702",
+              "excerpt": "A Study of Vemurafenib in Previously Treated Patients With Metastatic Melanoma",
+              "field": "brief_title"
+            },
+            {
+              "nct_id": "NCT01271803",
+              "excerpt": "A Study of Vemurafenib and GDC-0973 (Cobimetinib) in Participants With BRAFV600E Mutation-Positive Metastatic Melanoma",
+              "field": "brief_title"
+            }
+          ]
+        }
+      ]
+    },
+    "meta": {
+      "source": "clinicaltrials.gov",
+      "total_trials_matched": 3736,
+      "trials_aggregated": 3736,
+      "filters_applied": {
+        "condition": "melanoma"
+      },
+      "query_interpretation": "Planned by the deterministic rule-based fallback (no LLM key configured).",
+      "units": "trials",
+      "sort": "edges by weight desc",
+      "assumptions": [],
+      "truncated": false
+    }
+  }
+}

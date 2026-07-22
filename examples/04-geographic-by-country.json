@@ -1,0 +1,1687 @@
+{
+  "request": {
+    "query": "Which countries have the most trials for melanoma?",
+    "condition": "melanoma"
+  },
+  "response": {
+    "status": "ok",
+    "visualization": {
+      "kind": "chart",
+      "type": "choropleth",
+      "title": "Trials by country in melanoma",
+      "encoding": {
+        "x": {
+          "field": "key",
+          "label": "Country"
+        },
+        "y": {
+          "field": "value",
+          "label": "Trial count"
+        },
+        "series": null
+      },
+      "data": [
+        {
+          "key": "United States",
+          "label": "United States",
+          "value": 2254,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT02482532",
+              "excerpt": "United States",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03420963",
+              "excerpt": "United States",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06605404",
+              "excerpt": "United States",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "France",
+          "label": "France",
+          "value": 402,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT03285230",
+              "excerpt": "France",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT00338130",
+              "excerpt": "France",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03293784",
+              "excerpt": "France",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Australia",
+          "label": "Australia",
+          "value": 305,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT00338130",
+              "excerpt": "Australia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT00003308",
+              "excerpt": "Australia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT01006980",
+              "excerpt": "Australia",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Germany",
+          "label": "Germany",
+          "value": 305,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT04628806",
+              "excerpt": "Germany",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT02571036",
+              "excerpt": "Germany",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT02035956",
+              "excerpt": "Germany",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Spain",
+          "label": "Spain",
+          "value": 297,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT03820986",
+              "excerpt": "Spain",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06608420",
+              "excerpt": "Spain",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03394937",
+              "excerpt": "Spain",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "United Kingdom",
+          "label": "United Kingdom",
+          "value": 294,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT07718243",
+              "excerpt": "United Kingdom",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT00338130",
+              "excerpt": "United Kingdom",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT00757614",
+              "excerpt": "United Kingdom",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Italy",
+          "label": "Italy",
+          "value": 283,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06880198",
+              "excerpt": "Italy",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT01223248",
+              "excerpt": "Italy",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT07691255",
+              "excerpt": "Italy",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Canada",
+          "label": "Canada",
+          "value": 260,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT00338130",
+              "excerpt": "Canada",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03464604",
+              "excerpt": "Canada",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03769285",
+              "excerpt": "Canada",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "China",
+          "label": "China",
+          "value": 205,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT05645484",
+              "excerpt": "China",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03820986",
+              "excerpt": "China",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT05180851",
+              "excerpt": "China",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Netherlands",
+          "label": "Netherlands",
+          "value": 189,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT02571036",
+              "excerpt": "Netherlands",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT01006980",
+              "excerpt": "Netherlands",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT05054062",
+              "excerpt": "Netherlands",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Belgium",
+          "label": "Belgium",
+          "value": 167,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT03394937",
+              "excerpt": "Belgium",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT01302496",
+              "excerpt": "Belgium",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06697301",
+              "excerpt": "Belgium",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Switzerland",
+          "label": "Switzerland",
+          "value": 161,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT00338130",
+              "excerpt": "Switzerland",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT01006980",
+              "excerpt": "Switzerland",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03820986",
+              "excerpt": "Switzerland",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Poland",
+          "label": "Poland",
+          "value": 121,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT03820986",
+              "excerpt": "Poland",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06587451",
+              "excerpt": "Poland",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06697301",
+              "excerpt": "Poland",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Israel",
+          "label": "Israel",
+          "value": 115,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06896552",
+              "excerpt": "Israel",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT01006980",
+              "excerpt": "Israel",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03820986",
+              "excerpt": "Israel",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Sweden",
+          "label": "Sweden",
+          "value": 105,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT03073304",
+              "excerpt": "Sweden",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT01006980",
+              "excerpt": "Sweden",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03820986",
+              "excerpt": "Sweden",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Denmark",
+          "label": "Denmark",
+          "value": 97,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT00338130",
+              "excerpt": "Denmark",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06697301",
+              "excerpt": "Denmark",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT00370136",
+              "excerpt": "Denmark",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "South Korea",
+          "label": "South Korea",
+          "value": 93,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT03780608",
+              "excerpt": "South Korea",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03820986",
+              "excerpt": "South Korea",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06587451",
+              "excerpt": "South Korea",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Austria",
+          "label": "Austria",
+          "value": 92,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT00338130",
+              "excerpt": "Austria",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06280040",
+              "excerpt": "Austria",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT02035956",
+              "excerpt": "Austria",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Russia",
+          "label": "Russia",
+          "value": 87,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT05732805",
+              "excerpt": "Russia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03050047",
+              "excerpt": "Russia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06320353",
+              "excerpt": "Russia",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Norway",
+          "label": "Norway",
+          "value": 70,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06697301",
+              "excerpt": "Norway",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT01436656",
+              "excerpt": "Norway",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03246412",
+              "excerpt": "Norway",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Japan",
+          "label": "Japan",
+          "value": 69,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT04293289",
+              "excerpt": "Japan",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT01436656",
+              "excerpt": "Japan",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06285097",
+              "excerpt": "Japan",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Brazil",
+          "label": "Brazil",
+          "value": 68,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT00338130",
+              "excerpt": "Brazil",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03820986",
+              "excerpt": "Brazil",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT05002569",
+              "excerpt": "Brazil",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Czechia",
+          "label": "Czechia",
+          "value": 58,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06697301",
+              "excerpt": "Czechia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT05002569",
+              "excerpt": "Czechia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT04410445",
+              "excerpt": "Czechia",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Taiwan",
+          "label": "Taiwan",
+          "value": 53,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT05933577",
+              "excerpt": "Taiwan",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT00940225",
+              "excerpt": "Taiwan",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06054555",
+              "excerpt": "Taiwan",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Greece",
+          "label": "Greece",
+          "value": 51,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06587451",
+              "excerpt": "Greece",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT04490564",
+              "excerpt": "Greece",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT05002569",
+              "excerpt": "Greece",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Argentina",
+          "label": "Argentina",
+          "value": 50,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT00338130",
+              "excerpt": "Argentina",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT01729663",
+              "excerpt": "Argentina",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT05002569",
+              "excerpt": "Argentina",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "South Africa",
+          "label": "South Africa",
+          "value": 49,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT03820986",
+              "excerpt": "South Africa",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06697301",
+              "excerpt": "South Africa",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT05933577",
+              "excerpt": "South Africa",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Hungary",
+          "label": "Hungary",
+          "value": 46,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06697301",
+              "excerpt": "Hungary",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT00911443",
+              "excerpt": "Hungary",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT02263508",
+              "excerpt": "Hungary",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "New Zealand",
+          "label": "New Zealand",
+          "value": 45,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT01006980",
+              "excerpt": "New Zealand",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06697301",
+              "excerpt": "New Zealand",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06897735",
+              "excerpt": "New Zealand",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Portugal",
+          "label": "Portugal",
+          "value": 38,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT01223248",
+              "excerpt": "Portugal",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06587451",
+              "excerpt": "Portugal",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06697301",
+              "excerpt": "Portugal",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Finland",
+          "label": "Finland",
+          "value": 36,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06697301",
+              "excerpt": "Finland",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT05002569",
+              "excerpt": "Finland",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT05212103",
+              "excerpt": "Finland",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Ireland",
+          "label": "Ireland",
+          "value": 34,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT02177110",
+              "excerpt": "Ireland",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT00974610",
+              "excerpt": "Ireland",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT01597908",
+              "excerpt": "Ireland",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Turkey (T\u00fcrkiye)",
+          "label": "Turkey (T\u00fcrkiye)",
+          "value": 31,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT07256184",
+              "excerpt": "Turkey (T\u00fcrkiye)",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT05933577",
+              "excerpt": "Turkey (T\u00fcrkiye)",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06099782",
+              "excerpt": "Turkey (T\u00fcrkiye)",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Chile",
+          "label": "Chile",
+          "value": 28,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT03820986",
+              "excerpt": "Chile",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06587451",
+              "excerpt": "Chile",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06556004",
+              "excerpt": "Chile",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Mexico",
+          "label": "Mexico",
+          "value": 26,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT05002569",
+              "excerpt": "Mexico",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT02288897",
+              "excerpt": "Mexico",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06054555",
+              "excerpt": "Mexico",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Romania",
+          "label": "Romania",
+          "value": 24,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT05002569",
+              "excerpt": "Romania",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT04410445",
+              "excerpt": "Romania",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06054555",
+              "excerpt": "Romania",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Ukraine",
+          "label": "Ukraine",
+          "value": 21,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06054555",
+              "excerpt": "Ukraine",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT01597908",
+              "excerpt": "Ukraine",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT01245062",
+              "excerpt": "Ukraine",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Puerto Rico",
+          "label": "Puerto Rico",
+          "value": 20,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT00003308",
+              "excerpt": "Puerto Rico",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03509467",
+              "excerpt": "Puerto Rico",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03707574",
+              "excerpt": "Puerto Rico",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Slovenia",
+          "label": "Slovenia",
+          "value": 20,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT07422805",
+              "excerpt": "Slovenia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03551626",
+              "excerpt": "Slovenia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT07015190",
+              "excerpt": "Slovenia",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Singapore",
+          "label": "Singapore",
+          "value": 20,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT04140500",
+              "excerpt": "Singapore",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT02387307",
+              "excerpt": "Singapore",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT04198766",
+              "excerpt": "Singapore",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Serbia",
+          "label": "Serbia",
+          "value": 15,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06697301",
+              "excerpt": "Serbia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06054555",
+              "excerpt": "Serbia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT00005052",
+              "excerpt": "Serbia",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Slovakia",
+          "label": "Slovakia",
+          "value": 15,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT03551626",
+              "excerpt": "Slovakia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT02829775",
+              "excerpt": "Slovakia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT05926960",
+              "excerpt": "Slovakia",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Hong Kong",
+          "label": "Hong Kong",
+          "value": 14,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT07492680",
+              "excerpt": "Hong Kong",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT02083354",
+              "excerpt": "Hong Kong",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03311542",
+              "excerpt": "Hong Kong",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Bulgaria",
+          "label": "Bulgaria",
+          "value": 13,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT02967692",
+              "excerpt": "Bulgaria",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT02829775",
+              "excerpt": "Bulgaria",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT04657991",
+              "excerpt": "Bulgaria",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Georgia",
+          "label": "Georgia",
+          "value": 12,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06587451",
+              "excerpt": "Georgia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06054555",
+              "excerpt": "Georgia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT07160335",
+              "excerpt": "Georgia",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Estonia",
+          "label": "Estonia",
+          "value": 11,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06054555",
+              "excerpt": "Estonia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT00005052",
+              "excerpt": "Estonia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT07015190",
+              "excerpt": "Estonia",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "India",
+          "label": "India",
+          "value": 10,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT05732805",
+              "excerpt": "India",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT02829775",
+              "excerpt": "India",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT00835419",
+              "excerpt": "India",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Thailand",
+          "label": "Thailand",
+          "value": 10,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06054555",
+              "excerpt": "Thailand",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT02967692",
+              "excerpt": "Thailand",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT02083354",
+              "excerpt": "Thailand",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Lithuania",
+          "label": "Lithuania",
+          "value": 9,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06587451",
+              "excerpt": "Lithuania",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06054555",
+              "excerpt": "Lithuania",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03551626",
+              "excerpt": "Lithuania",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Colombia",
+          "label": "Colombia",
+          "value": 8,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT05933577",
+              "excerpt": "Colombia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT02142218",
+              "excerpt": "Colombia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT04305054",
+              "excerpt": "Colombia",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Croatia",
+          "label": "Croatia",
+          "value": 8,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06054555",
+              "excerpt": "Croatia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT00006249",
+              "excerpt": "Croatia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT01667419",
+              "excerpt": "Croatia",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Peru",
+          "label": "Peru",
+          "value": 7,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT00003308",
+              "excerpt": "Peru",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT02142218",
+              "excerpt": "Peru",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT05352672",
+              "excerpt": "Peru",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Malaysia",
+          "label": "Malaysia",
+          "value": 7,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06587451",
+              "excerpt": "Malaysia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06054555",
+              "excerpt": "Malaysia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT04834167",
+              "excerpt": "Malaysia",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Belarus",
+          "label": "Belarus",
+          "value": 7,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT05732805",
+              "excerpt": "Belarus",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03913923",
+              "excerpt": "Belarus",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT01765569",
+              "excerpt": "Belarus",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Bosnia and Herzegovina",
+          "label": "Bosnia and Herzegovina",
+          "value": 6,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06054555",
+              "excerpt": "Bosnia and Herzegovina",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT05907122",
+              "excerpt": "Bosnia and Herzegovina",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03178851",
+              "excerpt": "Bosnia and Herzegovina",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Moldova",
+          "label": "Moldova",
+          "value": 5,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06054555",
+              "excerpt": "Moldova",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT05907122",
+              "excerpt": "Moldova",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06551064",
+              "excerpt": "Moldova",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Latvia",
+          "label": "Latvia",
+          "value": 4,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT03551626",
+              "excerpt": "Latvia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT00057616",
+              "excerpt": "Latvia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT03625141",
+              "excerpt": "Latvia",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Philippines",
+          "label": "Philippines",
+          "value": 3,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06587451",
+              "excerpt": "Philippines",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06054555",
+              "excerpt": "Philippines",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06153238",
+              "excerpt": "Philippines",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Egypt",
+          "label": "Egypt",
+          "value": 3,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT03457766",
+              "excerpt": "Egypt",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT05315128",
+              "excerpt": "Egypt",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT01765543",
+              "excerpt": "Egypt",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "North Macedonia",
+          "label": "North Macedonia",
+          "value": 3,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06551064",
+              "excerpt": "North Macedonia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT01307397",
+              "excerpt": "North Macedonia",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT06153238",
+              "excerpt": "North Macedonia",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Luxembourg",
+          "label": "Luxembourg",
+          "value": 2,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT03771859",
+              "excerpt": "Luxembourg",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT02156804",
+              "excerpt": "Luxembourg",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Lebanon",
+          "label": "Lebanon",
+          "value": 2,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06054555",
+              "excerpt": "Lebanon",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT02404441",
+              "excerpt": "Lebanon",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Vietnam",
+          "label": "Vietnam",
+          "value": 2,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06054555",
+              "excerpt": "Vietnam",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT05907122",
+              "excerpt": "Vietnam",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Iceland",
+          "label": "Iceland",
+          "value": 2,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT00346008",
+              "excerpt": "Iceland",
+              "field": "country"
+            },
+            {
+              "nct_id": "NCT00001898",
+              "excerpt": "Iceland",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Reunion",
+          "label": "Reunion",
+          "value": 1,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT05367180",
+              "excerpt": "Reunion",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Jordan",
+          "label": "Jordan",
+          "value": 1,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06054555",
+              "excerpt": "Jordan",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Venezuela",
+          "label": "Venezuela",
+          "value": 1,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT02050594",
+              "excerpt": "Venezuela",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Tajikistan",
+          "label": "Tajikistan",
+          "value": 1,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT03311542",
+              "excerpt": "Tajikistan",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Uzbekistan",
+          "label": "Uzbekistan",
+          "value": 1,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT03311542",
+              "excerpt": "Uzbekistan",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Cyprus",
+          "label": "Cyprus",
+          "value": 1,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT01844674",
+              "excerpt": "Cyprus",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Uganda",
+          "label": "Uganda",
+          "value": 1,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT07576725",
+              "excerpt": "Uganda",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Pakistan",
+          "label": "Pakistan",
+          "value": 1,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT06640530",
+              "excerpt": "Pakistan",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Bangladesh",
+          "label": "Bangladesh",
+          "value": 1,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT00392561",
+              "excerpt": "Bangladesh",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Albania",
+          "label": "Albania",
+          "value": 1,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT01307397",
+              "excerpt": "Albania",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Ecuador",
+          "label": "Ecuador",
+          "value": 1,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT01307397",
+              "excerpt": "Ecuador",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Kazakhstan",
+          "label": "Kazakhstan",
+          "value": 1,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT07707986",
+              "excerpt": "Kazakhstan",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Saudi Arabia",
+          "label": "Saudi Arabia",
+          "value": 1,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT02402244",
+              "excerpt": "Saudi Arabia",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Guam",
+          "label": "Guam",
+          "value": 1,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT02465060",
+              "excerpt": "Guam",
+              "field": "country"
+            }
+          ]
+        },
+        {
+          "key": "Cuba",
+          "label": "Cuba",
+          "value": 1,
+          "series": null,
+          "citations": [
+            {
+              "nct_id": "NCT03541148",
+              "excerpt": "Cuba",
+              "field": "country"
+            }
+          ]
+        }
+      ]
+    },
+    "meta": {
+      "source": "clinicaltrials.gov",
+      "total_trials_matched": 3736,
+      "trials_aggregated": 3736,
+      "filters_applied": {
+        "condition": "melanoma"
+      },
+      "query_interpretation": "Planned by the deterministic rule-based fallback (no LLM key configured).",
+      "units": "trials",
+      "sort": "value desc",
+      "assumptions": [],
+      "truncated": false
+    }
+  }
+}
