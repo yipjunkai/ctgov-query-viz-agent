@@ -36,6 +36,7 @@ from ctgov_agent.engine.vizselect import (
 )
 from ctgov_agent.planner.base import Planner, PlannerError
 from ctgov_agent.planner.ir import (
+    CategoricalDim,
     ComparisonPlan,
     DistributionPlan,
     Filters,
@@ -102,6 +103,19 @@ def _no_data(
     message: str = "No trials matched the query, so there is nothing to visualize.",
 ) -> RefusedResponse:
     return RefusedResponse(reason="no_data", message=message)
+
+
+def _missing_dimension_message(dim: CategoricalDim, count: int) -> str:
+    """Honest no-data message when trials *did* match but none carry the grouped dimension.
+
+    Without this, an all-null dimension (e.g. a phase breakdown over a purely observational match
+    set) would wrongly report "no trials matched" when thousands did.
+    """
+    label = dim.value.replace("_", " ")
+    return (
+        f"Matched {count:,} trials, but none report a {label} value, so there is nothing to "
+        f"break down."
+    )
 
 
 # Refuse rather than aggregate a match set too large to count exactly. Well under the paging
@@ -186,6 +200,8 @@ class Pipeline:
         total, records = await self._fetch(plan.filters)
         buckets = aggregate_by_dimension(records, plan.dimension)
         if not buckets:
+            if records:
+                return _no_data(_missing_dimension_message(plan.dimension, len(records)))
             return _no_data()
         viz, sort_desc = distribution_chart(plan, buckets)
         return OkResponse(
@@ -221,6 +237,8 @@ class Pipeline:
             aggregated += len(records)
             series_results.append((series.label, aggregate_by_dimension(records, plan.dimension)))
         if all(not buckets for _label, buckets in series_results):
+            if aggregated:
+                return _no_data(_missing_dimension_message(plan.dimension, aggregated))
             return _no_data()
         viz, sort_desc = comparison_chart(plan, series_results)
         meta = Meta(
