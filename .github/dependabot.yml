@@ -1,11 +1,15 @@
+# Automated dependency updates (OpenSSF Scorecard: Dependency-Update-Tool).
 version: 2
 updates:
-  # Keep the SHA-pinned GitHub Actions current (grouped into one PR).
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  # Python packages — native uv ecosystem (reads pyproject.toml + uv.lock).
+  - package-ecosystem: uv
+    directory: /
     schedule:
-      interval: "weekly"
-      day: "monday"
-    groups:
-      actions:
-        patterns: ["*"]
+      interval: weekly
+    open-pull-requests-limit: 5
+
+  # GitHub Actions — keeps the pinned action SHAs current.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
